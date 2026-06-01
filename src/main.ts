@@ -1,6 +1,7 @@
 import {createApp} from 'vue'
 import './style.css'
 import './tailwind.css'
+// @ts-ignore
 import App from './App.vue'
 import Home from "./components/Home.vue";
 import Donate from "./components/Donate.vue";
