@@ -1,0 +1,55 @@
+<script setup lang="ts">
+import {useWeb3AuthConnect} from '@web3auth/modal/vue'
+import {watch} from "vue";
+
+const {connect, isConnected} = useWeb3AuthConnect()
+
+watch(isConnected, (newVal) => {
+  if (newVal) {
+    window.location.href = "/dashboard";
+  }
+})
+</script>
+
+<template>
+  <div class="min-h-screen flex lg:p-0 p-4 flex-col gap-12 justify-center items-center">
+    <div class="flex flex-col gap-8 items-center justify-center max-w-xl">
+      <img src="/paymoi-full.svg" class="w-96" alt="PayMoi Logo"/>
+      <p class="text-center">
+        แพลตฟอร์มโดเนทสำหรับสตรีมเมอร์ ปลอดภัยผ่านระบบบล็อกเชน ใช้ฟรีตลอดกาล
+      </p>
+      <button v-if="!isConnected" @click="connect" class="btn btn-primary">
+        สมัครเลย
+      </button>
+      <button v-else class="btn btn-primary">
+        เข้าหน้าแดชบอร์ด
+      </button>
+    </div>
+    <div class="flex lg:flex-row flex-col gap-2 items-center justify-center">
+      <div
+          class="flex flex-col gap-2 w-48 h-48 items-center justify-center text-center bg-white/10 p-4 rounded border border-white/20">
+        <i class="fas fa-person text-3xl"></i>
+        <b>ปลอดภัย</b>
+        <p>ไม่มีการเปิดเผยชื่อหรือรับเงินแทน</p>
+      </div>
+      <div
+          class="flex flex-col gap-2 w-48 h-48 items-center justify-center text-center bg-white/10 p-4 rounded border border-white/20">
+        <i class="fas fa-bolt-lightning text-3xl"></i>
+        <b>รวดเร็ว</b>
+        <p>ได้เงินเข้าวอลเล็ตทันที ไม่ต้องรอรับเงิน</p>
+      </div>
+      <div
+          class="flex flex-col gap-2 w-48 h-48 items-center justify-center text-center bg-white/10 p-4 rounded border border-white/20">
+        <i class="fas fa-money-bill text-3xl"></i>
+        <b>ฟรี</b>
+        <p>ไม่เสียค่าใช้จ่ายตลอดชีพ ใคร ๆ ก็สมัครได้</p>
+      </div>
+      <div
+          class="flex flex-col gap-2 w-48 h-48 items-center justify-center text-center bg-white/10 p-4 rounded border border-white/20">
+        <i class="fas fa-bell text-3xl"></i>
+        <b>โอเวอร์เลย์</b>
+        <p>มีโอเวอร์เลย์สำหรับสตรีมเมอร์ เพื่อใช้ในสตรีม</p>
+      </div>
+    </div>
+  </div>
+</template>
