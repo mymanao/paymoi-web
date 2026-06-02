@@ -9,13 +9,17 @@ import {createRouter, createWebHistory} from "vue-router";
 import Login from "./components/Login.vue";
 import Dashboard from "./components/Dashboard.vue";
 import Overlay from "./components/Overlay.vue";
+import Terms from "./components/Terms.vue";
+import Privacy from "./components/Privacy.vue";
 
 const routes = [
     {path: '/', component: Home},
     {path: '/login', component: Login},
     {path: '/donate/:name', component: Donate},
     {path: '/dashboard', component: Dashboard},
-    {path: '/overlay/:wallet', component: Overlay}
+    {path: '/overlay/:wallet', component: Overlay},
+    {path: '/terms', component: Terms},
+    {path: '/privacy', component: Privacy}
 ]
 
 export const router = createRouter({
