@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import {useWeb3AuthConnect} from '@web3auth/modal/vue'
-import {watch} from "vue";
 
 const {connect, isConnected} = useWeb3AuthConnect()
 
-watch(isConnected, (newVal) => {
-  if (newVal) {
-    window.location.href = "/dashboard";
-  }
-})
+// watch(isConnected, (newVal) => {
+//   if (newVal) {
+//     window.location.href = "/dashboard";
+//   }
+// })
 </script>
 
 <template>
@@ -21,7 +20,7 @@ watch(isConnected, (newVal) => {
       <button v-if="!isConnected" @click="connect" class="btn btn-primary">
         สมัครเลย
       </button>
-      <button v-else class="btn btn-primary">
+      <button v-else class="btn btn-primary" @click="$router.push('/dashboard')">
         เข้าหน้าแดชบอร์ด
       </button>
     </div>
