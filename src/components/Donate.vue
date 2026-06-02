@@ -105,6 +105,7 @@ onMounted(async () => {
   } catch {
   }
 
+  //@ts-ignore
   my_modal_5.showModal();
 })
 
