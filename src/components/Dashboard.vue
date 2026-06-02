@@ -242,7 +242,6 @@ function sendTestAlert() {
         v-if="isLoading"
         class="flex flex-col gap-8 items-center justify-center max-w-xl"
     >
-      <img src="https://pawmi.otternoon.com/assets/paymoi-full.svg" class="w-96" alt="PayMoi Logo"/>
       <p class="text-center text-2xl">
         <span class="loading loading-infinity loading-xl"></span>
         กำลังโหลดข้อมูล
@@ -254,7 +253,6 @@ function sendTestAlert() {
     >
       <div class="flex flex-col w-full max-w-5xl gap-8 lg:p-24 p-8">
         <div class="flex flex-col items-center gap-6 mb-2">
-          <img src="https://pawmi.otternoon.com/assets/paymoi-full.svg" class="w-64 sm:w-80" alt="PayMoi Logo"/>
           <h1 class="font-bold text-3xl text-center">การตั้งค่า</h1>
         </div>
 
@@ -556,7 +554,6 @@ function sendTestAlert() {
         v-else
         class="flex flex-col gap-8 items-center justify-center max-w-xl"
     >
-      <img src="https://pawmi.otternoon.com/assets/paymoi-full.svg" class="w-96" alt="PayMoi Logo"/>
       <h1 class="font-bold text-2xl">สร้างบัญชีผู้ใช้สำหรับสตรีมเมอร์</h1>
       <div class="flex flex-col gap-2">
         <input
