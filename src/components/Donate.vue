@@ -47,12 +47,12 @@ const publicClient = createPublicClient({
 
 const usdcAmount = computed(() => (thbAmount.value / rate.value).toFixed(6))
 
-const avatarUrl = computed(() => webConfig.value.avatarUrl ?? null)
-const bannerUrl = computed(() => webConfig.value.bannerUrl ?? null)
+const avatarUrl = computed(() => webConfig.value.avatarUrl ?? `https://gravatar.com/avatar/${Date.now()}?d=retro&s=600`)
+const bannerUrl = computed(() => webConfig.value.bannerUrl ?? `https://picsum.photos/seed/${Date.now()}/800/600`)
 const bannerStyle = computed(() => ({
   backgroundImage: bannerUrl.value ? `url(${bannerUrl.value})` : 'none',
   backgroundColor: webConfig.value.colors?.background ?? '#1b1717',
-  backgroundSize: 'fit',
+  backgroundSize: 'cover',
   backgroundPosition: 'center center',
   backgroundRepeat: 'repeat',
 }))
@@ -258,7 +258,7 @@ async function donate() {
       <div class="flex justify-center mb-0 z-10 relative">
         <div class="avatar">
           <div class="w-24 rounded-full ring-4 ring-base-100 shadow-xl bg-base-300">
-            <img v-if="avatarUrl" :src="avatarUrl"
+            <img :src="avatarUrl"
                  @error="(e) => (e.target as HTMLImageElement).style.display = 'none'"/>
           </div>
         </div>
