@@ -77,7 +77,7 @@ async function fetchBalance(userAddress: string) {
       maximumFractionDigits: 2
     })
 
-    const eth = await publicClient.getBalance({ address: userAddress as `0x${string}` });
+    const eth = await publicClient.getBalance({address: userAddress as `0x${string}`});
     ethBalance.value = Number(formatUnits(eth, 18)).toFixed(5);
   } catch (e) {
     console.error("ดึงยอดเงิน USDC ล้มเหลว:", e)
