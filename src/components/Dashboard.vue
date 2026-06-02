@@ -256,282 +256,283 @@ function sendTestAlert() {
           <h1 class="font-bold text-3xl text-center">การตั้งค่า</h1>
         </div>
 
-        <div class="flex flex-col lg:flex-row gap-8 w-full">
-          <div class="flex-1 flex flex-col gap-6">
-            <h2 class="text-xl font-semibold text-center border-b pb-2">
-              หน้าโดเนท
-            </h2>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ชื่อที่แสดง</span>
-              <input
-                  v-model="displayName"
-                  type="text"
-                  class="input w-full"
-                  placeholder="เช่น กรุงLnW_Za007"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ข้อความ ใต้ชื่อ</span>
-              <input
-                  v-model="webConfig.subText"
-                  type="text"
-                  class="input w-full"
-                  placeholder="เช่น ขอบคุณที่โดเนทน้า"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ข้อความ ช่องจำนวนเงิน</span>
-              <input
-                  v-model="webConfig.amountLabel"
-                  type="text"
-                  class="input w-full"
-                  placeholder="จำนวนเงิน"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ข้อความ ช่องข้อความ</span>
-              <input
-                  v-model="webConfig.messageLabel"
-                  type="text"
-                  class="input w-full"
-                  placeholder="ข้อความถึงสตรีมเมอร์"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ข้อความ ปุ่มโดเนท</span>
-              <input
-                  v-model="webConfig.confirmLabel"
-                  type="text"
-                  class="input w-full"
-                  placeholder="โดเนทเลย!"
-              />
-            </div>
-            <div class="flex flex-col gap-3">
-              <span class="text-sm font-medium text-center"
-              >สีของหน้าและข้อความ</span
-              >
-              <div class="flex flex-wrap justify-center gap-6">
-                <label class="flex flex-col items-center gap-1">
-                  <span class="text-xs">หัวเรื่อง</span>
+        <div class="flex flex-col gap-6 w-full">
+          <div class="collapse collapse-arrow border border-base-300 bg-white/5">
+            <input type="radio" name="settings-accordion" checked/>
+            <div class="collapse-title text-xl font-semibold">หน้าโดเนท</div>
+            <div class="collapse-content">
+              <div class="flex flex-col gap-6">
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ชื่อที่แสดง</span>
                   <input
-                      v-model="webConfig.colors!.header"
-                      type="color"
-                      class="w-12 h-12 rounded-lg cursor-pointer"
+                      v-model="displayName"
+                      type="text"
+                      class="input w-full"
+                      placeholder="เช่น กรุงLnW_Za007"
                   />
-                </label>
-                <label class="flex flex-col items-center gap-1">
-                  <span class="text-xs">ข้อความ</span>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ข้อความ ใต้ชื่อ</span>
                   <input
-                      v-model="webConfig.colors!.text"
-                      type="color"
-                      class="w-12 h-12 rounded-lg cursor-pointer"
+                      v-model="webConfig.subText"
+                      type="text"
+                      class="input w-full"
+                      placeholder="เช่น ขอบคุณที่โดเนทน้า"
                   />
-                </label>
-                <label class="flex flex-col items-center gap-1">
-                  <span class="text-xs">พื้นหลัง</span>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ข้อความ ช่องจำนวนเงิน</span>
                   <input
-                      v-model="webConfig.colors!.background"
-                      type="color"
-                      class="w-12 h-12 rounded-lg cursor-pointer"
+                      v-model="webConfig.amountLabel"
+                      type="text"
+                      class="input w-full"
+                      placeholder="จำนวนเงิน"
                   />
-                </label>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ข้อความ ช่องข้อความ</span>
+                  <input
+                      v-model="webConfig.messageLabel"
+                      type="text"
+                      class="input w-full"
+                      placeholder="ข้อความถึงสตรีมเมอร์"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ข้อความ ปุ่มโดเนท</span>
+                  <input
+                      v-model="webConfig.confirmLabel"
+                      type="text"
+                      class="input w-full"
+                      placeholder="โดเนทเลย!"
+                  />
+                </div>
+                <div class="flex flex-col gap-3">
+                  <span class="text-sm font-medium text-center"
+                  >สีของหน้าและข้อความ</span
+                  >
+                  <div class="flex flex-wrap justify-center gap-6">
+                    <label class="flex flex-col items-center gap-1">
+                      <span class="text-xs">หัวเรื่อง</span>
+                      <input
+                          v-model="webConfig.colors!.header"
+                          type="color"
+                          class="w-12 h-12 rounded-lg cursor-pointer"
+                      />
+                    </label>
+                    <label class="flex flex-col items-center gap-1">
+                      <span class="text-xs">ข้อความ</span>
+                      <input
+                          v-model="webConfig.colors!.text"
+                          type="color"
+                          class="w-12 h-12 rounded-lg cursor-pointer"
+                      />
+                    </label>
+                    <label class="flex flex-col items-center gap-1">
+                      <span class="text-xs">พื้นหลัง</span>
+                      <input
+                          v-model="webConfig.colors!.background"
+                          type="color"
+                          class="w-12 h-12 rounded-lg cursor-pointer"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">Avatar (1:1)</span>
+                  <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      class="file-input w-full"
+                      @change="e => selectFile('avatar', (e.target as HTMLInputElement).files![0])"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">Banner (16:9)</span>
+                  <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      class="file-input w-full"
+                      @change="e => selectFile('banner', (e.target as HTMLInputElement).files![0])"
+                  />
+                </div>
+
+                <RouterLink
+                    :to="`/donate/${streamer.username}`"
+                    target="_blank"
+                    class="w-full"
+                >
+                  <button class="btn btn-secondary w-full">
+                    ดูหน้าเว็บโดเนท
+                  </button>
+                </RouterLink>
               </div>
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">Avatar (1:1)</span>
-              <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  class="file-input w-full"
-                  @change="e => selectFile('avatar', (e.target as HTMLInputElement).files![0])"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">Banner (16:9)</span>
-              <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  class="file-input w-full"
-                  @change="e => selectFile('banner', (e.target as HTMLInputElement).files![0])"
-              />
             </div>
           </div>
 
-          <div class="hidden lg:block divider divider-horizontal"></div>
+          <div class="collapse collapse-arrow border border-base-300 bg-white/5">
+            <input type="radio" name="settings-accordion"/>
+            <div class="collapse-title text-xl font-semibold">หน้าแจ้งเตือน (Overlay)</div>
+            <div class="collapse-content">
+              <div class="flex flex-col gap-6">
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">URL รูปภาพ / GIF</span>
+                  <input
+                      v-model="webConfig.overlay!.imageUrl"
+                      type="url"
+                      class="input w-full"
+                      placeholder="https://example.com/catjam.gif"
+                  />
+                </div>
 
-          <div class="flex-1 flex flex-col gap-6">
-            <h2 class="text-xl font-semibold text-center border-b pb-2">
-              หน้าแจ้งเตือน (Overlay)
-            </h2>
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">URL เสียงแจ้งเตือน</span>
+                  <input
+                      v-model="webConfig.overlay!.soundUrl"
+                      type="url"
+                      class="input w-full"
+                      placeholder="https://example.com/donate.mp3"
+                  />
+                </div>
 
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">URL รูปภาพ / GIF</span>
-              <input
-                  v-model="webConfig.overlay!.imageUrl"
-                  type="url"
-                  class="input w-full"
-                  placeholder="https://example.com/catjam.gif"
-              />
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">สีชื่อผู้บริจาค</span>
+                  <input
+                      v-model="webConfig.overlay!.donatorColor"
+                      type="color"
+                      class="w-full h-10 rounded-lg cursor-pointer"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">สียอดโดเนท</span>
+                  <input
+                      v-model="webConfig.overlay!.amountColor"
+                      type="color"
+                      class="w-full h-10 rounded-lg cursor-pointer"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">สีข้อความ</span>
+                  <input
+                      v-model="webConfig.overlay!.textColor"
+                      type="color"
+                      class="w-full h-10 rounded-lg cursor-pointer"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ขนาด GIF (%)</span>
+                  <input
+                      v-model.number="webConfig.overlay!.imageScale"
+                      type="number"
+                      min="25"
+                      max="300"
+                      class="input input-sm w-full"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ขนาดหัวเรื่อง</span>
+                  <input
+                      v-model.number="webConfig.overlay!.headingSize"
+                      type="number"
+                      min="16"
+                      max="96"
+                      class="input input-sm w-full"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ขนาดข้อความ</span>
+                  <input
+                      v-model.number="webConfig.overlay!.messageSize"
+                      type="number"
+                      min="12"
+                      max="72"
+                      class="input input-sm w-full"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ระยะเวลาแสดงผล (ms)</span>
+                  <input
+                      v-model.number="webConfig.overlay!.displayDuration"
+                      type="number"
+                      min="1000"
+                      max="30000"
+                      step="500"
+                      class="input input-sm w-full"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ระยะเวลาอนิเมชัน (ms)</span>
+                  <input
+                      v-model.number="webConfig.overlay!.animDuration"
+                      type="number"
+                      min="100"
+                      max="2000"
+                      step="50"
+                      class="input input-sm w-full"
+                  />
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">อนิเมชันตอนเข้า</span>
+                  <select
+                      v-model="webConfig.overlay!.animIn"
+                      class="select select-sm w-full"
+                  >
+                    <option value="fade">Fade</option>
+                    <option value="pop">Pop</option>
+                    <option value="none">None</option>
+                  </select>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">อนิเมชันตอนออก</span>
+                  <select
+                      v-model="webConfig.overlay!.animOut"
+                      class="select select-sm w-full"
+                  >
+                    <option value="fade">Fade</option>
+                    <option value="pop">Pop</option>
+                    <option value="none">None</option>
+                  </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <RouterLink
+                      :to="`/overlay/${address}`"
+                      target="_blank"
+                      class="w-full"
+                  >
+                    <button class="btn btn-accent w-full">
+                      เปิดหน้า Alert
+                    </button>
+                  </RouterLink>
+
+                  <button
+                      class="btn btn-warning w-full"
+                      @click="sendTestAlert"
+                  >
+                    ทดสอบ Alert
+                  </button>
+                </div>
+              </div>
             </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">URL เสียงแจ้งเตือน</span>
-              <input
-                  v-model="webConfig.overlay!.soundUrl"
-                  type="url"
-                  class="input w-full"
-                  placeholder="https://example.com/donate.mp3"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">สีชื่อผู้บริจาค</span>
-              <input
-                  v-model="webConfig.overlay!.donatorColor"
-                  type="color"
-                  class="w-full h-10 rounded-lg cursor-pointer"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">สียอดโดเนท</span>
-              <input
-                  v-model="webConfig.overlay!.amountColor"
-                  type="color"
-                  class="w-full h-10 rounded-lg cursor-pointer"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">สีข้อความ</span>
-              <input
-                  v-model="webConfig.overlay!.textColor"
-                  type="color"
-                  class="w-full h-10 rounded-lg cursor-pointer"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ขนาด GIF (%)</span>
-              <input
-                  v-model.number="webConfig.overlay!.imageScale"
-                  type="number"
-                  min="25"
-                  max="300"
-                  class="input input-sm w-full"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ขนาดหัวเรื่อง</span>
-              <input
-                  v-model.number="webConfig.overlay!.headingSize"
-                  type="number"
-                  min="16"
-                  max="96"
-                  class="input input-sm w-full"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ขนาดข้อความ</span>
-              <input
-                  v-model.number="webConfig.overlay!.messageSize"
-                  type="number"
-                  min="12"
-                  max="72"
-                  class="input input-sm w-full"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ระยะเวลาแสดงผล (ms)</span>
-              <input
-                  v-model.number="webConfig.overlay!.displayDuration"
-                  type="number"
-                  min="1000"
-                  max="30000"
-                  step="500"
-                  class="input input-sm w-full"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">ระยะเวลาอนิเมชัน (ms)</span>
-              <input
-                  v-model.number="webConfig.overlay!.animDuration"
-                  type="number"
-                  min="100"
-                  max="2000"
-                  step="50"
-                  class="input input-sm w-full"
-              />
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">อนิเมชันตอนเข้า</span>
-              <select
-                  v-model="webConfig.overlay!.animIn"
-                  class="select select-sm w-full"
-              >
-                <option value="fade">Fade</option>
-                <option value="pop">Pop</option>
-                <option value="none">None</option>
-              </select>
-            </div>
-
-            <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium">อนิเมชันตอนออก</span>
-              <select
-                  v-model="webConfig.overlay!.animOut"
-                  class="select select-sm w-full"
-              >
-                <option value="fade">Fade</option>
-                <option value="pop">Pop</option>
-                <option value="none">None</option>
-              </select>
-            </div>
-
           </div>
         </div>
 
         <div class="flex flex-col gap-4 mt-8">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <RouterLink
-                :to="`/donate/${streamer.username}`"
-                target="_blank"
-                class="w-full"
-            >
-              <button class="btn btn-secondary w-full">
-                ดูหน้าเว็บโดเนท
-              </button>
-            </RouterLink>
-
-            <RouterLink
-                :to="`/overlay/${address}`"
-                target="_blank"
-                class="w-full"
-            >
-              <button class="btn btn-accent w-full">
-                เปิดหน้า Alert
-              </button>
-            </RouterLink>
-
-            <button
-                class="btn btn-warning w-full"
-                @click="sendTestAlert"
-            >
-              ทดสอบ Alert
-            </button>
-          </div>
-
           <div class="flex gap-3">
             <button
                 class="btn btn-primary flex-1"
