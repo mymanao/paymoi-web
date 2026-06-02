@@ -2,8 +2,9 @@
 import {useRoute} from "vue-router"
 import {useWeb3Auth} from '@web3auth/modal/vue'
 import {useWeb3AuthConnect} from '@web3auth/modal/vue'
-import {onMounted, ref, computed} from "vue"
-import {encodeFunctionData, parseUnits} from "viem";
+import {onMounted, ref, computed, watch} from "vue"
+import {createPublicClient, encodeFunctionData, parseUnits, http, formatUnits} from "viem";
+import {base, baseSepolia} from "viem/chains";
 
 interface WebConfig {
   subText?: string
@@ -35,6 +36,14 @@ const thbAmount = ref(20)
 const message = ref("")
 const rate = ref(33)
 const sending = ref(false)
+const address = ref("");
+const usdcBalance = ref("0.00");
+const ethBalance = ref("0.0000");
+const url = import.meta.env.DEV ? 'https://sepolia.base.org' : 'https://mainnet.base.org'
+const publicClient = createPublicClient({
+  chain: import.meta.env.DEV ? baseSepolia : base,
+  transport: http(url)
+})
 
 const usdcAmount = computed(() => (thbAmount.value / rate.value).toFixed(6))
 
@@ -47,6 +56,33 @@ const bannerStyle = computed(() => ({
   backgroundPosition: 'center center',
   backgroundRepeat: 'repeat',
 }))
+
+async function fetchBalance(userAddress: string) {
+  try {
+    const balance = await publicClient.readContract({
+      address: USDC_ADDRESS,
+      abi: [{
+        name: 'balanceOf',
+        type: 'function',
+        inputs: [{name: 'account', type: 'address'}],
+        outputs: [{type: 'uint256'}],
+        stateMutability: 'view'
+      }] as const,
+      functionName: 'balanceOf',
+      args: [userAddress as `0x${string}`]
+    })
+
+    usdcBalance.value = Number(formatUnits(balance, 6)).toLocaleString('th-TH', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })
+
+    const eth = await publicClient.getBalance({ address: userAddress as `0x${string}` });
+    ethBalance.value = Number(formatUnits(eth, 18)).toFixed(5);
+  } catch (e) {
+    console.error("ดึงยอดเงิน USDC ล้มเหลว:", e)
+  }
+}
 
 onMounted(async () => {
   const name = route.params.name
@@ -68,9 +104,20 @@ onMounted(async () => {
     rate.value = d['usd-coin'].thb
   } catch {
   }
+
+  my_modal_5.showModal();
 })
 
-const USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
+watch(provider, async (p) => {
+  if (!p) return
+  const accounts = (await p.request({method: 'eth_accounts'})) as string[];
+  if (accounts?.length) {
+    address.value = accounts[0]
+    await fetchBalance(accounts[0])
+  }
+}, {immediate: true})
+
+const USDC_ADDRESS = import.meta.env.DEV ? '0x036CbD53842c5426634e7929541eC2318f3dCF7e' : '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
 const USDC_ABI = [{
   name: 'transfer',
   type: 'function',
@@ -95,7 +142,7 @@ async function sendUSDC(to: string, usdcAmount: string): Promise<string> {
       from: (await provider.value.request({method: 'eth_accounts'}) as string[])[0],
       to: USDC_ADDRESS,
       data,
-      chainId: '0x2105'
+      chainId: import.meta.env.DEV ? '0x14a34' : '0x2105'
     }]
   })
 
@@ -151,6 +198,61 @@ async function donate() {
     </div>
 
     <div v-else class="relative w-full max-w-md">
+      <dialog id="my_modal_5" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+          <h3 class="text-2xl mb-6 font-bold text-center">เติมเงินเพื่อแปลงเป็นสกุลเงินคริปโต</h3>
+          <p class="text-center text-sm font-bold text-success mb-4">
+            ยอดเงินปัจจุบัน: {{ usdcBalance }} USDC
+            ({{
+              (Number(usdcBalance.replace(/,/g, '')) * rate).toLocaleString('th-TH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })
+            }} บาท) + {{ ethBalance }} ETH
+          </p>
+          <div class="flex flex-col gap-4">
+            <span class="text-base">
+              คุณมีบัญชีไว้รับเงินคริปโตแล้วจ้า อิอิ ตอนนี้ได้เวลาเติมเงินหล่ะ <br>
+              สามารถเปิดบัญชี <a class="text-blue-500 underline" target="_blank" href="https://www.binance.th/th">Binance TH</a> ยืนยันตัวตนแล้วเติมเงินไทยได้เลย!<br>
+              ขั้นต่ำคือ 100 บาทนะ แล้วก็กด "Withdraw"
+              <ul class="list-disc list-inside">
+                <li>เลือกเหรียญ "USDC"</li>
+                <li>เลือกเน็ตเวิร์ก "Base"</li>
+              </ul>
+              ส่วน Address ให้ใส่เป็นเลขบัญชีด้านล่างเลยจรุ้ว <br>
+            </span>
+            <input v-model="address" type="text" min="1" class="input w-full disabled" readonly/>
+            <p class="text-base">
+              จากนั้นให้ทำอีกรอบ แต่รอบนี้เปลี่ยนจาก "USDC" เป็น "ETH" <br>
+              ให้โอนสัก <b>1 บาท (0.000016ETH)</b> พอ <br>
+              ใช้เป็นค่าธรรมเนียมการโอนในบล็อกเชนเรียกว่าค่า "Gas" <br>
+              (ธุรกรรมนึงใช้แค่หลักสตางค์ ดังนั้น 1 บาทนี้ใช้ได้ยาว ๆ เลย)
+            </p>
+            <div class="divider"></div>
+            <p class="text-sm">
+              เงินในกระเป๋าจะคงอยู่ สามารถใช้เพื่อโดเนทครั้งต่อไปได้
+              สามารถขายเป็นเงินไทยด้วยการโอนกลับไปที่เดิมแล้วกดขายได้เลย (ในแอพ Binance TH ผ่านเมนู Buy/Sell)
+              <br> <br>
+              จัดการกระเป๋าเงินได้ที่ <a href="https://wallet.web3auth.io" target="_blank"
+                                         class="text-blue-500 underline">Web3Auth Wallet</a>
+              โดยล็อกอินด้วยบัญชีเดียวกันกับ PayMoi
+            </p>
+            <p class="text-base font-bold text-red-400">
+              เลือกโอนผ่านเน็ตเวิร์ก "BASE" เท่านั้น ไม่งั้นเงินหายนะ!
+            </p>
+          </div>
+          <div class="modal-action">
+            <div class="flex gap-2">
+              <a href="https://www.binance.th/th" target="_blank">
+                <button class="btn btn-accent">ไปที่ Binance TH</button>
+              </a>
+              <form method="dialog">
+                <button class="btn btn-success">รู้แล้ว</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </dialog>
 
       <div class="flex justify-center mb-0 z-10 relative">
         <div class="avatar">
