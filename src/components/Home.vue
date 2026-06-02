@@ -14,7 +14,7 @@ watch(isConnected, (newVal) => {
 <template>
   <div class="min-h-screen flex lg:p-0 p-4 flex-col gap-12 justify-center items-center">
     <div class="flex flex-col gap-8 items-center justify-center max-w-xl">
-      <img src="/paymoi-full.svg" class="w-96" alt="PayMoi Logo"/>
+      <img src="https://pawmi.otternoon.com/assets/paymoi-full.svg" class="w-96" alt="PayMoi Logo"/>
       <p class="text-center">
         แพลตฟอร์มโดเนทสำหรับสตรีมเมอร์ ปลอดภัยผ่านระบบบล็อกเชน ใช้ฟรีตลอดกาล
       </p>
