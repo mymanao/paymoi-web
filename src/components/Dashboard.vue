@@ -125,7 +125,9 @@ async function register() {
     })
   })
   const data = await res.json()
-  if (data.success) hasAccount.value = true;
+  if (data.success) {
+    hasAccount.value = true;
+  }
   if (data.error) alert(data.error)
 }
 
@@ -253,7 +255,7 @@ function sendTestAlert() {
     >
       <div class="flex flex-col w-full max-w-5xl gap-8 lg:p-24 p-8">
         <div class="flex flex-col items-center gap-6 mb-2">
-          <h1 class="font-bold text-3xl text-center">การตั้งค่า</h1>
+          <h1 class="font-bold text-3xl text-center">แดชบอร์ด</h1>
         </div>
 
         <div class="flex flex-col gap-6 w-full">
@@ -288,7 +290,7 @@ function sendTestAlert() {
                       v-model="webConfig.amountLabel"
                       type="text"
                       class="input w-full"
-                      placeholder="จำนวนเงิน"
+                      placeholder="จำนวน (บาท)"
                   />
                 </div>
 
@@ -364,7 +366,7 @@ function sendTestAlert() {
                 </div>
 
                 <RouterLink
-                    :to="`/donate/${streamer.username}`"
+                    :to="`/donate/${streamer.username ?? username}`"
                     target="_blank"
                     class="w-full"
                 >
@@ -382,12 +384,21 @@ function sendTestAlert() {
             <div class="collapse-content">
               <div class="flex flex-col gap-6">
                 <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">URL โอเวอร์เลย์ (ก๊อปปี้และวางในโปรแกรมสตรีม เช่น OBS, StreamLabs, และอื่น ๆ)</span>
+                  <input
+                      :value="`https://paymoi.otternoon.com/overlay/${address}`"
+                      type="url"
+                      class="input w-full"
+                      readonly
+                  />
+                </div>
+                <div class="flex flex-col gap-1">
                   <span class="text-sm font-medium">URL รูปภาพ / GIF</span>
                   <input
                       v-model="webConfig.overlay!.imageUrl"
                       type="url"
                       class="input w-full"
-                      placeholder="https://example.com/catjam.gif"
+                      placeholder="https://pawmi.otternoon.com/assets/donate.gif"
                   />
                 </div>
 
@@ -397,7 +408,7 @@ function sendTestAlert() {
                       v-model="webConfig.overlay!.soundUrl"
                       type="url"
                       class="input w-full"
-                      placeholder="https://example.com/donate.mp3"
+                      placeholder="https://pawmi.otternoon.com/assets/donate.wav"
                   />
                 </div>
 

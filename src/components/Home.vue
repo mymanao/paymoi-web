@@ -15,7 +15,7 @@ const {connect, isConnected} = useWeb3AuthConnect()
     <div class="flex flex-col gap-8 items-center justify-center max-w-xl">
       <img src="https://pawmi.otternoon.com/assets/paymoi-full.svg" class="w-96" alt="PayMoi Logo"/>
       <p class="text-center">
-        แพลตฟอร์มโดเนทสำหรับสตรีมเมอร์ ปลอดภัยผ่านระบบบล็อกเชน ใช้ฟรีตลอดกาล
+        แพลตฟอร์มโดเนททางเลือกผ่านบล็อกเชน ไม่มีการเปิดเผยตัวตน ไม่เก็บข้อมูลส่วนตัว ไม่มีค่าแพลตฟอร์ม รับและโดเนทเงินเป็นสกุลเงินดิจิตอล เริ่มสมัครเลย!
       </p>
       <button v-if="!isConnected" @click="connect" class="btn btn-primary">
         สมัครเลย
@@ -24,7 +24,7 @@ const {connect, isConnected} = useWeb3AuthConnect()
         เข้าหน้าแดชบอร์ด
       </button>
     </div>
-    <div class="flex lg:flex-row flex-col gap-2 items-center justify-center">
+    <div class="lg:flex lg:flex-row grid grid-cols-2 flex-col lg:gap-2 items-center justify-center">
       <div
           class="flex flex-col gap-2 w-48 h-48 items-center justify-center text-center bg-white/10 p-4 rounded border border-white/20">
         <i class="fas fa-person text-3xl"></i>

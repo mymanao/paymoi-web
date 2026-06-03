@@ -6,7 +6,7 @@ import App from './App.vue'
 import Home from "./components/Home.vue";
 import Donate from "./components/Donate.vue";
 import {createRouter, createWebHistory} from "vue-router";
-import Login from "./components/Login.vue";
+import Account from "./components/Account.vue";
 import Dashboard from "./components/Dashboard.vue";
 import Overlay from "./components/Overlay.vue";
 import Terms from "./components/Terms.vue";
@@ -14,7 +14,7 @@ import Privacy from "./components/Privacy.vue";
 
 const routes = [
     {path: '/', component: Home},
-    {path: '/login', component: Login},
+    {path: '/account', component: Account},
     {path: '/donate/:name', component: Donate},
     {path: '/dashboard', component: Dashboard},
     {path: '/overlay/:wallet', component: Overlay},

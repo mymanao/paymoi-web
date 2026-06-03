@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import {useWeb3AuthConnect} from "@web3auth/modal/vue";
+import {ref, watch} from "vue";
+
+const hasAccount = ref<boolean>(false);
+const {isConnected} = useWeb3AuthConnect();
+
+watch(isConnected, (c) => {
+  hasAccount.value = c
+})
 </script>
 <template>
   <header
@@ -13,8 +22,11 @@
         <li>
           <RouterLink to="/">หน้าแรก</RouterLink>
         </li>
-        <li>
+        <li v-if="hasAccount">
           <RouterLink to="/dashboard">แดชบอร์ด</RouterLink>
+        </li>
+        <li>
+          <RouterLink to="/account">บัญชี</RouterLink>
         </li>
       </ul>
     </div>
