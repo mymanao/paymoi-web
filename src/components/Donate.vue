@@ -199,7 +199,7 @@ async function donate() {
     </div>
 
     <div v-else class="relative w-full max-w-md">
-      <dialog id="my_modal_5" class="modal modal-bottom sm:modal-middle">
+      <dialog v-if="isConnected" id="my_modal_5" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box">
           <h3 class="text-2xl mb-6 font-bold text-center">เติมเงินเพื่อแปลงเป็นสกุลเงินคริปโต</h3>
           <p class="text-center text-sm font-bold text-success mb-4">
