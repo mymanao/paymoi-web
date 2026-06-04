@@ -214,11 +214,11 @@ async function donate() {
           <div class="flex flex-col gap-2">
             <span class="text-base">
               <ul class="list-decimal list-inside">
-                <li>เปิดบัญชี <a href="https://www.binance.th/th">Binance TH <i
+                <li>เปิดบัญชี <a class="link" href="https://www.binance.th/th">Binance TH <i
                     class="fa-solid fa-arrow-up-right-from-square"></i></a> (ก.ล.ต. รับรองถูกต้องตามกฎหมาย)</li>
-                <li>ซื้อเหรียญ <b>USD Coin (USDC)</b> ขั้นต่ำ 3.3 บาท <a href="https://www.binance.th/th/convert">เปิดเมนูซื้อขาย <i
+                <li>ซื้อเหรียญ <b>USD Coin (USDC)</b> ขั้นต่ำ 3.3 บาท <a class="link" href="https://www.binance.th/th/convert">เปิดเมนูซื้อขาย <i
                     class="fa-solid fa-arrow-up-right-from-square"></i></a></li>
-                <li>กดถอนเงินออก <a
+                <li>กดถอนเงินออก <a class="link"
                     href="https://www.binance.th/th/announcement/crypto-deposit-%7C-withdrawal/3f5f1b8c95f544d4b1276f458df6366f">ดูวิธีการ <i
                     class="fa-solid fa-arrow-up-right-from-square"></i></a></li>
                 <li>เลือกเหรียญ <b>USD Coin (USDC)</b> เลือกเครือข่าย <b>Base</b></li>
@@ -248,8 +248,7 @@ async function donate() {
               เงินในกระเป๋าจะคงอยู่ สามารถใช้เพื่อโดเนทครั้งต่อไปได้
               สามารถขายเป็นเงินไทยด้วยการโอนกลับไปที่เดิมแล้วกดขายได้เลย (ในแอพ Binance TH ผ่านเมนู Buy/Sell)
               <br> <br>
-              จัดการกระเป๋าเงินได้ที่ <a href="https://wallet.web3auth.io" target="_blank"
-                                         class="text-blue-500 underline">Web3Auth Wallet <i
+              จัดการกระเป๋าเงินได้ที่ <a class="link" href="https://wallet.web3auth.io" target="_blank">Web3Auth Wallet <i
                 class="fa-solid fa-arrow-up-right-from-square"></i></a>
               โดยล็อกอินด้วยบัญชีเดียวกันกับ PayMoi
               <span class="divider"></span>
@@ -327,7 +326,7 @@ async function donate() {
 </template>
 
 <style>
-a {
+.link {
   color: var(--color-blue-500);
   text-decoration: underline;
 }
