@@ -211,35 +211,49 @@ async function donate() {
               })
             }} บาท) + {{ ethBalance }} ETH
           </p>
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
             <span class="text-base">
-              คุณมีบัญชีไว้รับเงินคริปโตแล้วจ้า อิอิ ตอนนี้ได้เวลาเติมเงินหล่ะ <br>
-              สามารถเปิดบัญชี <a class="text-blue-500 underline" target="_blank" href="https://www.binance.th/th">Binance TH</a> ยืนยันตัวตนแล้วเติมเงินไทยได้เลย!<br>
-              ขั้นต่ำคือ 100 บาทนะ แล้วก็กด "Withdraw"
-              <ul class="list-disc list-inside">
-                <li>เลือกเหรียญ "USDC"</li>
-                <li>เลือกเน็ตเวิร์ก "Base"</li>
+              <ul class="list-decimal list-inside">
+                <li>เปิดบัญชี <a href="https://www.binance.th/th">Binance TH <i
+                    class="fa-solid fa-arrow-up-right-from-square"></i></a> (ก.ล.ต. รับรองถูกต้องตามกฎหมาย)</li>
+                <li>ซื้อเหรียญ <b>USD Coin (USDC)</b> ขั้นต่ำ 3.3 บาท <a href="https://www.binance.th/th/convert">เปิดเมนูซื้อขาย <i
+                    class="fa-solid fa-arrow-up-right-from-square"></i></a></li>
+                <li>กดถอนเงินออก <a
+                    href="https://www.binance.th/th/announcement/crypto-deposit-%7C-withdrawal/3f5f1b8c95f544d4b1276f458df6366f">ดูวิธีการ <i
+                    class="fa-solid fa-arrow-up-right-from-square"></i></a></li>
+                <li>เลือกเหรียญ <b>USD Coin (USDC)</b> เลือกเครือข่าย <b>Base</b></li>
+                <li>กรอกบัญชีตามด้านล่างต่อไปนี้</li>
               </ul>
-              ส่วน Address ให้ใส่เป็นเลขบัญชีด้านล่างเลยจรุ้ว <br>
             </span>
-            <input v-model="address" type="text" min="1" class="input w-full disabled" readonly/>
-            <p class="text-base">
-              จากนั้นให้ทำอีกรอบ แต่รอบนี้เปลี่ยนจาก "USDC" เป็น "ETH" <br>
-              ให้โอนสัก <b>1 บาท (0.000016ETH)</b> พอ <br>
-              ใช้เป็นค่าธรรมเนียมการโอนในบล็อกเชนเรียกว่าค่า "Gas" <br>
-              (ธุรกรรมนึงใช้แค่หลักสตางค์ ดังนั้น 1 บาทนี้ใช้ได้ยาว ๆ เลย)
+            <p class="text-base font-bold text-red-400">
+              เลือกโอนผ่านเน็ตเวิร์ก "Base" เท่านั้น ไม่งั้นเงินหายนะ!
             </p>
+            <input v-model="address" type="text" min="1" class="input w-full disabled" readonly/>
+            <ul class="list-disc list-inside">
+              <li>
+                จากนั้น ทำแบบเดียวกันแบบข้างต้น แต่เลือกเหรียญ ETH
+              </li>
+              <li class="text-red-400">
+                เลือกเครือข่าย Base เหมือนเดิมเท่านั้น
+              </li>
+              <li>
+                โอนเข้ามาที่บัญชีเดิมเพียงแค่ 1 บาทไว้เป็นค่าธรรมเนียมของบล็อกเชน
+              </li>
+              <li>
+                ใช้ธุรกรรมละเพียงหลักสตางค์ ผ่านเครือข่าย Base
+              </li>
+            </ul>
             <div class="divider"></div>
             <p class="text-sm">
               เงินในกระเป๋าจะคงอยู่ สามารถใช้เพื่อโดเนทครั้งต่อไปได้
               สามารถขายเป็นเงินไทยด้วยการโอนกลับไปที่เดิมแล้วกดขายได้เลย (ในแอพ Binance TH ผ่านเมนู Buy/Sell)
               <br> <br>
               จัดการกระเป๋าเงินได้ที่ <a href="https://wallet.web3auth.io" target="_blank"
-                                         class="text-blue-500 underline">Web3Auth Wallet</a>
+                                         class="text-blue-500 underline">Web3Auth Wallet <i
+                class="fa-solid fa-arrow-up-right-from-square"></i></a>
               โดยล็อกอินด้วยบัญชีเดียวกันกับ PayMoi
-            </p>
-            <p class="text-base font-bold text-red-400">
-              เลือกโอนผ่านเน็ตเวิร์ก "BASE" เท่านั้น ไม่งั้นเงินหายนะ!
+              <span class="divider"></span>
+              (เปย์มัวไม่มีหน้าที่ในการครอบครองเงินใด ๆ ทั้งสิ้น กระเป๋าเงินถูกจัดการโดย MetaMask ของบริษัท ConsenSys)
             </p>
           </div>
           <div class="modal-action">
@@ -311,3 +325,10 @@ async function donate() {
     </div>
   </div>
 </template>
+
+<style>
+a {
+  color: var(--color-blue-500);
+  text-decoration: underline;
+}
+</style>
