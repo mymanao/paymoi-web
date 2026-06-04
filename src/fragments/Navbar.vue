@@ -28,6 +28,10 @@ watch(isConnected, (c) => {
         <li>
           <RouterLink to="/account">บัญชี</RouterLink>
         </li>
+        <li>
+          <a target="_blank" href="https://manao.otternoon.com/paymoi/guides/">คู่มือ <i
+              class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </li>
       </ul>
     </div>
   </header>

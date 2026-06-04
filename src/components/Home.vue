@@ -17,12 +17,16 @@ const {connect, isConnected} = useWeb3AuthConnect()
       <p class="text-center">
         แพลตฟอร์มโดเนททางเลือกผ่านบล็อกเชน ไม่มีการเปิดเผยตัวตน ไม่เก็บข้อมูลส่วนตัว ไม่มีค่าแพลตฟอร์ม รับและโดเนทเงินเป็นสกุลเงินดิจิตอล เริ่มสมัครเลย!
       </p>
-      <button v-if="!isConnected" @click="connect" class="btn btn-primary">
-        สมัครเลย
-      </button>
-      <button v-else class="btn btn-primary" @click="$router.push('/dashboard')">
-        เข้าหน้าแดชบอร์ด
-      </button>
+      <div class="flex gap-2">
+        <button v-if="!isConnected" @click="connect" class="btn btn-primary">
+          สมัครเลย
+        </button>
+        <button v-else class="btn btn-primary" @click="$router.push('/dashboard')">
+          เข้าหน้าแดชบอร์ด
+        </button>
+        <a class="btn btn-outline" target="_blank" href="https://manao.otternoon.com/paymoi/guides/">คู่มือ <i
+            class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      </div>
     </div>
     <div class="lg:flex lg:flex-row grid grid-cols-2 flex-col lg:gap-2 items-center justify-center">
       <div
