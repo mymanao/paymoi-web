@@ -3,25 +3,9 @@ import {useRoute} from "vue-router"
 import {useWeb3Auth} from '@web3auth/modal/vue'
 import {useWeb3AuthConnect} from '@web3auth/modal/vue'
 import {onMounted, ref, computed, watch} from "vue"
-import {createPublicClient, encodeFunctionData, parseUnits, http, formatUnits} from "viem";
-import {base, baseSepolia} from "viem/chains";
-
-interface WebConfig {
-  subText?: string
-  amountLabel?: string
-  messageLabel?: string
-  confirmLabel?: string
-  avatarUrl?: string;
-  bannerUrl?: string;
-  colors?: { header?: string; text?: string; background?: string }
-}
-
-interface Streamer {
-  wallet_addr: string
-  username: string
-  display_name: string
-  web_config: string
-}
+import {fetchBalance, sendUSDC} from "../helpers.ts";
+import type {Streamer, WebConfig} from "../types.ts";
+import {showModal} from "../composables/useModal.ts";
 
 const route = useRoute()
 const {provider} = useWeb3Auth()
@@ -39,11 +23,7 @@ const sending = ref(false)
 const address = ref("");
 const usdcBalance = ref("0.00");
 const ethBalance = ref("0.0000");
-const url = import.meta.env.DEV ? 'https://sepolia.base.org' : 'https://mainnet.base.org'
-const publicClient = createPublicClient({
-  chain: import.meta.env.DEV ? baseSepolia : base,
-  transport: http(url)
-})
+
 
 const usdcAmount = computed(() => (thbAmount.value / rate.value).toFixed(6))
 
@@ -57,32 +37,6 @@ const bannerStyle = computed(() => ({
   backgroundRepeat: 'repeat',
 }))
 
-async function fetchBalance(userAddress: string) {
-  try {
-    const balance = await publicClient.readContract({
-      address: USDC_ADDRESS,
-      abi: [{
-        name: 'balanceOf',
-        type: 'function',
-        inputs: [{name: 'account', type: 'address'}],
-        outputs: [{type: 'uint256'}],
-        stateMutability: 'view'
-      }] as const,
-      functionName: 'balanceOf',
-      args: [userAddress as `0x${string}`]
-    })
-
-    usdcBalance.value = Number(formatUnits(balance, 6)).toLocaleString('th-TH', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })
-
-    const eth = await publicClient.getBalance({address: userAddress as `0x${string}`});
-    ethBalance.value = Number(formatUnits(eth, 18)).toFixed(5);
-  } catch (e) {
-    console.error("ดึงยอดเงิน USDC ล้มเหลว:", e)
-  }
-}
 
 onMounted(async () => {
   const name = route.params.name
@@ -114,50 +68,25 @@ watch(provider, async (p) => {
   const accounts = (await p.request({method: 'eth_accounts'})) as string[];
   if (accounts?.length) {
     address.value = accounts[0]
-    await fetchBalance(accounts[0])
+    const {usdc, eth} = await fetchBalance(accounts[0]);
+    if (!usdc || !eth) {
+      alert("ไม่สามารถยอดเหรียญในบัญชีได้")
+    } else {
+      usdcBalance.value = usdc;
+      ethBalance.value = eth;
+    }
   }
 }, {immediate: true})
 
-const USDC_ADDRESS = import.meta.env.DEV ? '0x036CbD53842c5426634e7929541eC2318f3dCF7e' : '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
-const USDC_ABI = [{
-  name: 'transfer',
-  type: 'function',
-  inputs: [
-    {name: 'to', type: 'address'},
-    {name: 'amount', type: 'uint256'}
-  ],
-  outputs: [{type: 'bool'}],
-  stateMutability: 'nonpayable'
-}] as const
-
-async function sendUSDC(to: string, usdcAmount: string): Promise<string> {
-  const data = encodeFunctionData({
-    abi: USDC_ABI,
-    functionName: 'transfer',
-    args: [to as `0x${string}`, parseUnits(usdcAmount, 6)]
-  })
-
-  const txhash = await provider.value?.request({
-    method: 'eth_sendTransaction',
-    params: [{
-      from: (await provider.value.request({method: 'eth_accounts'}) as string[])[0],
-      to: USDC_ADDRESS,
-      data,
-      chainId: import.meta.env.DEV ? '0x14a34' : '0x2105'
-    }]
-  })
-
-  return txhash as string
-}
 
 async function donate() {
   if (!provider.value || !streamer.value) return
   if (!donatorName.value) {
-    alert("กรุณากรอกชื่อ");
+    await showModal("กรุณากรอกชื่อ");
     return
   }
   if (thbAmount.value < 1) {
-    alert("จำนวนเงินขั้นต่ำ 1 บาท");
+    await showModal("จำนวนเงินขั้นต่ำ 1 บาท");
     return
   }
 
@@ -165,7 +94,7 @@ async function donate() {
   try {
     const accounts = await provider.value.request({method: 'eth_accounts'}) as string[]
     const from = accounts[0]
-    const txhash = await sendUSDC(streamer.value.wallet_addr, usdcAmount.value)
+    const txhash = await sendUSDC(provider.value, streamer.value.wallet_addr, usdcAmount.value)
     await fetch('https://paypoint.otternoon.com/v1/donate/pending', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -176,10 +105,12 @@ async function donate() {
         message: message.value, txhash
       })
     })
-    alert("โดเนทสำเร็จ!")
+    showModal("ธุรกรรมเสร็จสิ้น จะทำการแสดงหน้าประวัติธุรกรรมจาก BaseScan ที่เปิดในหน้าใหม่")
+        .then(() => {
+          window.open(import.meta.env.DEV ? `https://sepolia.basescan.org/tx/${txhash}` : `https://basescan.org/tx/${txhash}`, '_blank')
+        })
   } catch (e) {
-    alert("เกิดข้อผิดพลาด")
-    console.error(e)
+    await showModal("เกิดข้อผิดพลาด: " + e)
   } finally {
     sending.value = false
   }
@@ -201,7 +132,7 @@ async function donate() {
     <div v-else class="relative w-full max-w-md">
       <dialog id="my_modal_5" class="modal modal-bottom sm:modal-middle">
         <div class="modal-box">
-          <h3 class="text-2xl mb-6 font-bold text-center">เติมเงินเพื่อแปลงเป็นสกุลเงินคริปโต</h3>
+          <h3 class="text-2xl mb-6 font-bold text-center">โดเนทเป็นคริปโต</h3>
           <div class="divider"></div>
           <div class="flex flex-col gap-2">
             <p class="font-bold text-yellow-500">
@@ -300,7 +231,7 @@ async function donate() {
       <div class="flex justify-center mb-0 z-10 relative">
         <div class="avatar">
           <div class="w-24 rounded-full ring-4 ring-base-100 shadow-xl bg-base-300">
-            <img :src="avatarUrl"
+            <img :src="avatarUrl" alt="Avatar"
                  @error="(e) => (e.target as HTMLImageElement).style.display = 'none'"/>
           </div>
         </div>
