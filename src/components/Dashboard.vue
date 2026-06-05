@@ -1,36 +1,9 @@
 <script setup lang="ts">
 import {useWeb3Auth} from '@web3auth/modal/vue'
 import {watch, ref} from "vue";
-
-interface OverlayConfig {
-  imageUrl?: string
-  soundUrl?: string
-  donatorColor?: string
-  amountColor?: string
-  textColor?: string
-  imageScale?: number
-  headingSize?: number
-  messageSize?: number
-  animIn?: 'fade' | 'pop' | 'none'
-  animOut?: 'fade' | 'pop' | 'none'
-  animDuration?: number
-  displayDuration?: number
-}
-
-interface WebConfig {
-  subText?: string
-  amountLabel?: string
-  messageLabel?: string
-  confirmLabel?: string
-  avatarUrl?: string
-  bannerUrl?: string
-  colors?: {
-    header?: string
-    text?: string
-    background?: string
-  }
-  overlay?: OverlayConfig
-}
+import type {OverlayConfig, WebConfig} from "../types.ts";
+import {randomTips} from "../helpers.ts";
+import {showModal} from "../composables/useModal.ts";
 
 const defaultOverlay: OverlayConfig = {
   imageUrl: 'https://pawmi.otternoon.com/assets/donate.gif',
@@ -74,6 +47,7 @@ watch(address, async (a) => {
   const data = await res.json();
   if (data.streamer) {
     streamer.value = data.streamer;
+    username.value = data.streamer.username;
     displayName.value = data.streamer.display_name ?? '';
     try {
       const parsed = JSON.parse(data.streamer.web_config)
@@ -97,15 +71,15 @@ watch(address, async (a) => {
 
 async function register() {
   if (username.value.length < 3 || username.value.length > 32) {
-    alert("ชื่อผู้ใช้ต้องยาวระหว่าง 3-32 ตัวอักษร")
+    await showModal("ชื่อผู้ใช้ต้องยาวระหว่าง 3-32 ตัวอักษร")
     return;
   } else if (/[^a-zA-Z0-9_]/.test(username.value)) {
-    alert("ชื่อผู้ใช้สามารถมีได้เฉพาะตัวอักษรภาษาอังกฤษ ตัวเลข และขีดล่างเท่านั้น")
+    await showModal("ชื่อผู้ใช้สามารถมีได้เฉพาะตัวอักษรภาษาอังกฤษ ตัวเลข และขีดล่างเท่านั้น")
     return;
   }
 
   if (displayName.value.length > 128) {
-    alert("ชื่อที่แสดงต้องมีความยาวน้อยกว่า 128 ตัวอักษร")
+    await showModal("ชื่อที่แสดงต้องมีความยาวน้อยกว่า 128 ตัวอักษร")
     return;
   }
   const message = `register_${Date.now()}`
@@ -128,7 +102,7 @@ async function register() {
   if (data.success) {
     hasAccount.value = true;
   }
-  if (data.error) alert(data.error)
+  if (data.error) await showModal(data.error)
 }
 
 async function updateProfile() {
@@ -171,7 +145,7 @@ async function updateProfile() {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       wallet_addr: address.value,
-      username: streamer.value.username,
+      username: username.value,
       display_name: displayName.value,
       web_config: JSON.stringify(webConfig.value),
       message,
@@ -179,11 +153,12 @@ async function updateProfile() {
     })
   })
   const data = await res.json()
-  if (data.success) alert('บันทึกสำเร็จ!')
-  if (data.error) alert(data.error)
+  if (data.success) await showModal('บันทึกสำเร็จ!')
+  if (data.error) await showModal(data.error)
 }
 
 function resetConfig() {
+  username.value = streamer.value.username;
   displayName.value = streamer.value.display_name ?? ''
   webConfig.value = {
     colors: {header: '#ffffff', text: 'oklch(0.83768 0.001 17.911)', background: '#1b1717'},
@@ -196,17 +171,33 @@ function selectFile(type: 'avatar' | 'banner', file: File) {
   else pendingBanner.value = file
 }
 
-function sendTestAlert() {
+async function sendTestAlert() {
   if (!address.value) {
-    alert("ไม่พบ wallet address");
+    await showModal("ไม่พบเลขที่บัญชี");
     return;
   }
 
+  const donators = [
+    "เต วรากร",
+    "เต้ มงคงกิตต์",
+    "ลีออน มักส์",
+    "สต๊อป จีฟส์",
+    "ซาร์ค มักเกอร์เบิร์ก",
+    "บารัค โอมาม่า",
+    "พี่บ้า เดอะสกี",
+    "กรมสรรพากร"
+  ];
+
+  const message = [
+    "พี่เต พี่เต นั่นคือเสียงเรียกจากเด็ก ๆ ที่เห็นไอดอลของ พวกเขาเดินผ่านมา ต่างคนต่างดีใจที่ได้เห็นพี่เต วรากร คนที่น้อง ๆ เขาชื่นชอบตัวเป็น ๆ สักครั้ง",
+    "เลิศ, เริ่ด, เริ๊ด, เฬิฏ, เฬิฎ, เฬิศ, เฬิษ, เฬิส, เฬิฐ, เฬิษฐ์, เฬิฏฐ์, เฬิธ, เฬิธธิ์, เฬิท, เฬิฑ, เฬิฒ, เฬิจ, เฬิช, เฬิซ, เฬิถ, เฬิศศิ์, เฬิสร์, เฬิ๊ฏ"
+  ]
+
   const testEvent = {
     event: "donation_received",
-    donator: "เต วรากร",
-    message: "พี่เต พี่เต นั่นคือเสียงเรียกจากเด็ก ๆ ที่เห็นไอดอลของ พวกเขาเดินผ่านมา ต่างคนต่างดีใจที่ได้เห็นพี่เต วรากร คนที่น้อง ๆ เขาชื่นชอบตัวเป็น ๆ สักครั้ง",
-    amount: "100",
+    donator: donators[Math.floor(Math.random() * donators.length)],
+    message: message[Math.floor(Math.random() * message.length)],
+    amount: "67",
     currency: "USDC",
     timestamp: new Date().toISOString()
   };
@@ -221,18 +212,18 @@ function sendTestAlert() {
     }));
   };
 
-  ws.onmessage = (e) => {
+  ws.onmessage = async (e) => {
     const res = JSON.parse(e.data);
     if (res.status === "success") {
-      alert("ส่ง test alert สำเร็จ ตรวจสอบหน้า overlay ของคุณ");
+      await showModal("ส่ง test alert สำเร็จ ตรวจสอบหน้า overlay ของคุณ");
     } else {
-      alert(`เกิดข้อผิดพลาด: ${res.error || "ไม่ทราบสาเหตุ"}`);
+      await showModal(`เกิดข้อผิดพลาด: ${res.error || "ไม่ทราบสาเหตุ"}`);
     }
     ws.close();
   };
 
-  ws.onerror = () => {
-    alert("ไม่สามารถเชื่อมต่อ WebSocket ได้");
+  ws.onerror = async () => {
+    await showModal("ไม่สามารถเชื่อมต่อ WebSocket ได้");
     ws.close();
   };
 }
@@ -248,6 +239,9 @@ function sendTestAlert() {
         <span class="loading loading-infinity loading-xl"></span>
         กำลังโหลดข้อมูล
       </p>
+      <p class="text-center text-sm italic">
+        {{ randomTips() }}
+      </p>
     </div>
     <div
         v-else-if="hasAccount"
@@ -260,10 +254,19 @@ function sendTestAlert() {
 
         <div class="flex flex-col gap-6 w-full">
           <div class="collapse collapse-arrow border border-base-300 bg-white/5">
-            <input type="radio" name="settings-accordion" checked/>
+            <input type="checkbox" name="settings-accordion" checked/>
             <div class="collapse-title text-xl font-semibold">หน้าโดเนท</div>
             <div class="collapse-content">
               <div class="flex flex-col gap-6">
+                <div class="flex flex-col gap-1">
+                  <span class="text-sm font-medium">ชื่อผู้ใช้ (donate/{{ username }})</span>
+                  <input
+                      v-model="username"
+                      type="text"
+                      class="input w-full"
+                      placeholder="skibi.di_67"
+                  />
+                </div>
                 <div class="flex flex-col gap-1">
                   <span class="text-sm font-medium">ชื่อที่แสดง</span>
                   <input
@@ -379,7 +382,7 @@ function sendTestAlert() {
           </div>
 
           <div class="collapse collapse-arrow border border-base-300 bg-white/5">
-            <input type="radio" name="settings-accordion"/>
+            <input type="checkbox" name="settings-accordion"/>
             <div class="collapse-title text-xl font-semibold">หน้าแจ้งเตือน (Overlay)</div>
             <div class="collapse-content">
               <div class="flex flex-col gap-6">
