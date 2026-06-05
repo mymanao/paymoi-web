@@ -206,7 +206,9 @@ async function donate() {
               เงินในกระเป๋าจะคงอยู่ สามารถใช้เพื่อโดเนทครั้งต่อไปได้
               สามารถขายเป็นเงินไทยด้วยการโอนกลับไปที่เดิมแล้วกดขายได้เลย (ในแอพ Binance TH ผ่านเมนู Buy/Sell)
               <br> <br>
-              จัดการกระเป๋าเงินได้ที่ <a class="link" href="https://wallet.web3auth.io" target="_blank">Web3Auth Wallet
+              โอนเหรียญออกจากกระเป๋าได้ที่ <a class="link" href="/account" target="_blank">หน้าบัญชี
+              <i
+                  class="fa-solid fa-arrow-up-right-from-square"></i></a> หรือ <a class="link" href="https://wallet.web3auth.io" target="_blank">Web3Auth Wallet
               <i
                   class="fa-solid fa-arrow-up-right-from-square"></i></a>
               โดยล็อกอินด้วยบัญชีเดียวกันกับ PayMoi
