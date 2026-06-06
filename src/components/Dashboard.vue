@@ -38,6 +38,8 @@ const displayName = ref("");
 const streamer = ref<any>({});
 const pendingAvatar = ref<File | null>(null);
 const pendingBanner = ref<File | null>(null);
+const pendingDonationImage = ref<File | null>(null);
+const pendingDonationSound = ref<File | null>(null);
 
 watch(
   provider,
@@ -70,19 +72,41 @@ watch(address, async (a) => {
         };
       }
     } catch {}
-    isLoading.value = false;
     hasAccount.value = true;
   } else {
-    isLoading.value = false;
     hasAccount.value = false;
   }
+  isLoading.value = false;
 });
+
+async function uploadFile(
+  endpoint: string,
+  file: File,
+  message: string,
+  signature: string,
+) {
+  const formData = new FormData();
+
+  formData.append("file", file);
+  formData.append("wallet_addr", address.value);
+  formData.append("message", message);
+  formData.append("signature", signature);
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    body: formData,
+  });
+
+  return await res.json();
+}
 
 async function register() {
   if (username.value.length < 3 || username.value.length > 32) {
     await showModal("ชื่อผู้ใช้ต้องยาวระหว่าง 3-32 ตัวอักษร");
     return;
-  } else if (/[^a-zA-Z0-9_]/.test(username.value)) {
+  }
+
+  if (/[^a-zA-Z0-9_]/.test(username.value)) {
     await showModal("ชื่อผู้ใช้สามารถมีได้เฉพาะตัวอักษรภาษาอังกฤษ ตัวเลข และขีดล่างเท่านั้น");
     return;
   }
@@ -122,44 +146,70 @@ async function updateProfile() {
   })) as string;
 
   if (pendingAvatar.value) {
-    const formData = new FormData();
-    formData.append("file", pendingAvatar.value);
-    formData.append("wallet_addr", address.value);
-    formData.append("message", message);
-    formData.append("signature", signature);
-    const res = await fetch(
+    const data = await uploadFile(
       "https://paypoint.otternoon.com/v1/streamers/upload/avatar",
-      {
-        method: "POST",
-        body: formData,
-      },
+      pendingAvatar.value,
+      message,
+      signature,
     );
-    const data = await res.json();
-    if (data.url) webConfig.value.avatarUrl = `${data.url}?v=${Date.now()}`;
+
+    if (data.url) {
+      webConfig.value.avatarUrl = `${data.url}?v=${Date.now()}`;
+    }
+
     pendingAvatar.value = null;
   }
 
   if (pendingBanner.value) {
-    const formData = new FormData();
-    formData.append("file", pendingBanner.value);
-    formData.append("wallet_addr", address.value);
-    formData.append("message", message);
-    formData.append("signature", signature);
-    const res = await fetch(
+    const data = await uploadFile(
       "https://paypoint.otternoon.com/v1/streamers/upload/banner",
-      {
-        method: "POST",
-        body: formData,
-      },
+      pendingBanner.value,
+      message,
+      signature,
     );
-    const data = await res.json();
-    if (data.url) webConfig.value.bannerUrl = data.url;
+
+    if (data.url) {
+      webConfig.value.bannerUrl = `${data.url}?v=${Date.now()}`;
+    }
+
     pendingBanner.value = null;
+  }
+
+  if (pendingDonationImage.value) {
+    const data = await uploadFile(
+      "https://paypoint.otternoon.com/v1/streamers/upload/donationImage",
+      pendingDonationImage.value,
+      message,
+      signature,
+    );
+
+    if (data.url) {
+      webConfig.value.overlay!.imageUrl = `${data.url}?v=${Date.now()}`;
+    }
+
+    pendingDonationImage.value = null;
+  }
+
+  if (pendingDonationSound.value) {
+    const data = await uploadFile(
+      "https://paypoint.otternoon.com/v1/streamers/upload/donationSound",
+      pendingDonationSound.value,
+      message,
+      signature,
+    );
+
+    if (data.url) {
+      webConfig.value.overlay!.soundUrl = `${data.url}?v=${Date.now()}`;
+    }
+
+    pendingDonationSound.value = null;
   }
 
   const res = await fetch("https://paypoint.otternoon.com/v1/streamers", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       wallet_addr: address.value,
       username: username.value,
@@ -169,27 +219,55 @@ async function updateProfile() {
       signature,
     }),
   });
+
   const data = await res.json();
-  if (data.success) await showModal("บันทึกสำเร็จ!");
-  if (data.error) await showModal(data.error);
+
+  if (data.success) {
+    await showModal("บันทึกสำเร็จ!");
+  }
+
+  if (data.error) {
+    await showModal(data.error);
+  }
 }
 
 function resetConfig() {
   username.value = streamer.value.username;
   displayName.value = streamer.value.display_name ?? "";
+
   webConfig.value = {
     colors: {
       header: "#ffffff",
       text: "oklch(0.83768 0.001 17.911)",
       background: "#1b1717",
     },
-    overlay: { ...defaultOverlay },
+    overlay: {
+      ...defaultOverlay,
+    },
   };
 }
 
-function selectFile(type: "avatar" | "banner", file: File) {
-  if (type === "avatar") pendingAvatar.value = file;
-  else pendingBanner.value = file;
+function selectFile(
+  type: "avatar" | "banner" | "donationImage" | "donationSound",
+  file: File,
+) {
+  switch (type) {
+    case "avatar":
+      pendingAvatar.value = file;
+      break;
+
+    case "banner":
+      pendingBanner.value = file;
+      break;
+
+    case "donationImage":
+      pendingDonationImage.value = file;
+      break;
+
+    case "donationSound":
+      pendingDonationSound.value = file;
+      break;
+  }
 }
 
 async function sendTestAlert() {
@@ -237,11 +315,13 @@ async function sendTestAlert() {
 
   ws.onmessage = async (e) => {
     const res = JSON.parse(e.data);
+
     if (res.status === "success") {
       await showModal("ส่ง test alert สำเร็จ ตรวจสอบหน้า overlay ของคุณ");
     } else {
       await showModal(`เกิดข้อผิดพลาด: ${res.error || "ไม่ทราบสาเหตุ"}`);
     }
+
     ws.close();
   };
 
@@ -419,22 +499,36 @@ async function sendTestAlert() {
                   />
                 </div>
                 <div class="flex flex-col gap-1">
-                  <span class="text-sm font-medium">URL รูปภาพ / GIF</span>
+                  <span class="text-sm font-medium">รูปแจ้งเตือนโดเนท (ไม่เกิน 12 MB)</span>
+
                   <input
-                      v-model="webConfig.overlay!.imageUrl"
+                      type="file"
+                      accept="image/gif"
+                      class="file-input w-full"
+                      @change="e => selectFile('donationImage',(e.target as HTMLInputElement).files![0])"
+                  />
+
+                  <input
+                      :value="webConfig.overlay!.imageUrl"
                       type="url"
                       class="input w-full"
-                      placeholder="https://pawmi.otternoon.com/assets/donate.gif"
+                      readonly
                   />
                 </div>
 
                 <div class="flex flex-col gap-1">
-                  <span class="text-sm font-medium">URL เสียงแจ้งเตือน</span>
+                  <span class="text-sm font-medium">เสียงแจ้งเตือนโดเนท (ไม่เกิน 12 MB)</span>
                   <input
-                      v-model="webConfig.overlay!.soundUrl"
+                      type="file"
+                      accept="audio/ogg,audio/webm,audio/mpeg,audio/wav"
+                      class="file-input w-full"
+                      @change="e => selectFile('donationSound',(e.target as HTMLInputElement).files![0])"
+                  />
+                  <input
+                      :value="webConfig.overlay!.soundUrl"
                       type="url"
                       class="input w-full"
-                      placeholder="https://pawmi.otternoon.com/assets/donate.wav"
+                      readonly
                   />
                 </div>
 
