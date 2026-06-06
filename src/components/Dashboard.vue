@@ -4,6 +4,7 @@ import { watch, ref } from "vue";
 import type { OverlayConfig, WebConfig } from "../types.ts";
 import { randomTips } from "../helpers.ts";
 import { showModal } from "../composables/useModal.ts";
+import {API_URL, SOCKET_URL} from "../consts.ts";
 
 const defaultOverlay: OverlayConfig = {
   imageUrl: "https://pawmi.otternoon.com/assets/donate.gif",
@@ -54,7 +55,7 @@ watch(
 watch(address, async (a) => {
   if (!a) return;
   const res = await fetch(
-    `https://paypoint.otternoon.com/v1/streamers/wallet/${a}`,
+    `${API_URL}v1/streamers/wallet/${a}`,
   );
   const data = await res.json();
   if (data.streamer) {
@@ -121,7 +122,7 @@ async function register() {
     params: [message, address.value],
   });
 
-  const res = await fetch("https://paypoint.otternoon.com/v1/streamers", {
+  const res = await fetch(`${API_URL}v1/streamers`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -147,7 +148,7 @@ async function updateProfile() {
 
   if (pendingAvatar.value) {
     const data = await uploadFile(
-      "https://paypoint.otternoon.com/v1/streamers/upload/avatar",
+      `${API_URL}v1/streamers/upload/avatar`,
       pendingAvatar.value,
       message,
       signature,
@@ -162,7 +163,7 @@ async function updateProfile() {
 
   if (pendingBanner.value) {
     const data = await uploadFile(
-      "https://paypoint.otternoon.com/v1/streamers/upload/banner",
+      `${API_URL}v1/streamers/upload/banner`,
       pendingBanner.value,
       message,
       signature,
@@ -177,7 +178,7 @@ async function updateProfile() {
 
   if (pendingDonationImage.value) {
     const data = await uploadFile(
-      "https://paypoint.otternoon.com/v1/streamers/upload/donationImage",
+      `${API_URL}v1/streamers/upload/donationImage`,
       pendingDonationImage.value,
       message,
       signature,
@@ -192,7 +193,7 @@ async function updateProfile() {
 
   if (pendingDonationSound.value) {
     const data = await uploadFile(
-      "https://paypoint.otternoon.com/v1/streamers/upload/donationSound",
+      `${API_URL}v1/streamers/upload/donationSound`,
       pendingDonationSound.value,
       message,
       signature,
@@ -205,7 +206,7 @@ async function updateProfile() {
     pendingDonationSound.value = null;
   }
 
-  const res = await fetch("https://paypoint.otternoon.com/v1/streamers", {
+  const res = await fetch(`${API_URL}v1/streamers`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -301,7 +302,7 @@ async function sendTestAlert() {
     timestamp: new Date().toISOString(),
   };
 
-  const ws = new WebSocket("wss://paypoint.otternoon.com/paymoi");
+  const ws = new WebSocket(SOCKET_URL);
 
   ws.onopen = () => {
     ws.send(

@@ -2,12 +2,6 @@
 import { useWeb3AuthConnect } from "@web3auth/modal/vue";
 
 const { connect, isConnected } = useWeb3AuthConnect();
-
-// watch(isConnected, (newVal) => {
-//   if (newVal) {
-//     window.location.href = "/dashboard";
-//   }
-// })
 </script>
 
 <template>

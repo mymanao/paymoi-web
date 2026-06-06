@@ -6,6 +6,7 @@ import { onMounted, ref, computed, watch } from "vue";
 import { fetchBalance, sendUSDC } from "../helpers.ts";
 import type { Streamer, WebConfig } from "../types.ts";
 import { showModal } from "../composables/useModal.ts";
+import {API_URL} from "../consts.ts";
 
 const route = useRoute();
 const { provider } = useWeb3Auth();
@@ -47,7 +48,7 @@ const bannerStyle = computed(() => ({
 onMounted(async () => {
   const name = route.params.name;
   const res = await fetch(
-    `https://paypoint.otternoon.com/v1/streamers/${name}`,
+    `${API_URL}v1/streamers/${name}`,
   );
   const data = await res.json();
   if (!data.success) {
@@ -112,7 +113,7 @@ async function donate() {
       streamer.value.wallet_addr,
       usdcAmount.value,
     );
-    await fetch("https://paypoint.otternoon.com/v1/donate/pending", {
+    await fetch(`${API_URL}v1/donate/pending`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -134,8 +135,8 @@ async function donate() {
         "_blank",
       );
     });
-  } catch (e) {
-    await showModal("เกิดข้อผิดพลาด: " + e);
+  } catch (e: any) {
+    await showModal("เกิดข้อผิดพลาด: " + e.message);
   } finally {
     sending.value = false;
   }

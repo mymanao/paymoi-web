@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { computed, onMounted, onUnmounted, ref } from "vue";
+import {API_URL, SOCKET_URL} from "../consts.ts";
 
 interface OverlayConfig {
   imageUrl?: string;
@@ -70,7 +71,7 @@ function showAlert(data: DonationAlert) {
 
 function connect() {
   if (!wallet) return;
-  ws = new WebSocket("wss://paypoint.otternoon.com/paymoi");
+  ws = new WebSocket(SOCKET_URL);
   ws.onopen = () => {
     ws?.send(JSON.stringify({ type: "overlay", wallet: wallet.toLowerCase() }));
   };
@@ -92,7 +93,7 @@ onMounted(async () => {
 
   try {
     const res = await fetch(
-      `https://paypoint.otternoon.com/v1/streamers/wallet/${wallet}`,
+      `${API_URL}v1/streamers/wallet/${wallet}`,
     );
     const data = await res.json();
     if (data.streamer?.web_config) {
