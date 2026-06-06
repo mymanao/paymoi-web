@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {useWeb3AuthConnect} from '@web3auth/modal/vue'
+import { useWeb3AuthConnect } from "@web3auth/modal/vue";
 
-const {connect, isConnected} = useWeb3AuthConnect()
+const { connect, isConnected } = useWeb3AuthConnect();
 
 // watch(isConnected, (newVal) => {
 //   if (newVal) {

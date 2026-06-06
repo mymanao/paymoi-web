@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import {useWeb3AuthConnect} from "@web3auth/modal/vue";
-import {ref, watch} from "vue";
+import { useWeb3AuthConnect } from "@web3auth/modal/vue";
+import { ref, watch } from "vue";
 
 const hasAccount = ref<boolean>(false);
-const {isConnected} = useWeb3AuthConnect();
+const { isConnected } = useWeb3AuthConnect();
 
 watch(isConnected, (c) => {
-  hasAccount.value = c
-})
+  hasAccount.value = c;
+});
 </script>
 <template>
   <header

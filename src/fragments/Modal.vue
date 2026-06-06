@@ -3,7 +3,7 @@ import {
   closeModal,
   modalMessage,
   modalOpen,
-  modalTitle
+  modalTitle,
 } from "../composables/useModal.ts";
 </script>
 

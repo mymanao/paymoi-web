@@ -1,66 +1,75 @@
 <script setup lang="ts">
-import {useWeb3Auth} from '@web3auth/modal/vue'
-import {watch, ref} from "vue";
-import type {OverlayConfig, WebConfig} from "../types.ts";
-import {randomTips} from "../helpers.ts";
-import {showModal} from "../composables/useModal.ts";
+import { useWeb3Auth } from "@web3auth/modal/vue";
+import { watch, ref } from "vue";
+import type { OverlayConfig, WebConfig } from "../types.ts";
+import { randomTips } from "../helpers.ts";
+import { showModal } from "../composables/useModal.ts";
 
 const defaultOverlay: OverlayConfig = {
-  imageUrl: 'https://pawmi.otternoon.com/assets/donate.gif',
-  soundUrl: 'https://pawmi.otternoon.com/assets/donate.wav',
-  donatorColor: '#ffffff',
-  amountColor: '#ffd54f',
-  textColor: '#ffffff',
+  imageUrl: "https://pawmi.otternoon.com/assets/donate.gif",
+  soundUrl: "https://pawmi.otternoon.com/assets/donate.wav",
+  donatorColor: "#ffffff",
+  amountColor: "#ffd54f",
+  textColor: "#ffffff",
   imageScale: 100,
   headingSize: 42,
   messageSize: 32,
-  animIn: 'fade',
-  animOut: 'fade',
+  animIn: "fade",
+  animOut: "fade",
   animDuration: 400,
   displayDuration: 8000,
-}
+};
 
 const webConfig = ref<WebConfig>({
-  colors: {header: '#ffffff', text: 'oklch(0.83768 0.001 17.911)', background: '#1b1717'},
-  overlay: {...defaultOverlay}
+  colors: {
+    header: "#ffffff",
+    text: "oklch(0.83768 0.001 17.911)",
+    background: "#1b1717",
+  },
+  overlay: { ...defaultOverlay },
 });
 
-const {provider} = useWeb3Auth()
+const { provider } = useWeb3Auth();
 const hasAccount = ref(false);
 const isLoading = ref(true);
-const address = ref("")
+const address = ref("");
 const username = ref("");
 const displayName = ref("");
 const streamer = ref<any>({});
-const pendingAvatar = ref<File | null>(null)
-const pendingBanner = ref<File | null>(null)
+const pendingAvatar = ref<File | null>(null);
+const pendingBanner = ref<File | null>(null);
 
-watch(provider, async (p) => {
-  if (!p) return
-  const accounts = (await p.request({method: 'eth_accounts'})) as string[];
-  if (accounts?.length) address.value = accounts[0]
-}, {immediate: true})
+watch(
+  provider,
+  async (p) => {
+    if (!p) return;
+    const accounts = (await p.request({ method: "eth_accounts" })) as string[];
+    if (accounts?.length) address.value = accounts[0];
+  },
+  { immediate: true },
+);
 
 watch(address, async (a) => {
   if (!a) return;
-  const res = await fetch(`https://paypoint.otternoon.com/v1/streamers/wallet/${a}`);
+  const res = await fetch(
+    `https://paypoint.otternoon.com/v1/streamers/wallet/${a}`,
+  );
   const data = await res.json();
   if (data.streamer) {
     streamer.value = data.streamer;
     username.value = data.streamer.username;
-    displayName.value = data.streamer.display_name ?? '';
+    displayName.value = data.streamer.display_name ?? "";
     try {
-      const parsed = JSON.parse(data.streamer.web_config)
+      const parsed = JSON.parse(data.streamer.web_config);
       if (parsed) {
         webConfig.value = {
           ...webConfig.value,
           ...parsed,
-          colors: {...webConfig.value.colors, ...parsed.colors},
-          overlay: {...defaultOverlay, ...parsed.overlay}
-        }
+          colors: { ...webConfig.value.colors, ...parsed.colors },
+          overlay: { ...defaultOverlay, ...parsed.overlay },
+        };
       }
-    } catch {
-    }
+    } catch {}
     isLoading.value = false;
     hasAccount.value = true;
   } else {
@@ -71,104 +80,116 @@ watch(address, async (a) => {
 
 async function register() {
   if (username.value.length < 3 || username.value.length > 32) {
-    await showModal("ชื่อผู้ใช้ต้องยาวระหว่าง 3-32 ตัวอักษร")
+    await showModal("ชื่อผู้ใช้ต้องยาวระหว่าง 3-32 ตัวอักษร");
     return;
   } else if (/[^a-zA-Z0-9_]/.test(username.value)) {
-    await showModal("ชื่อผู้ใช้สามารถมีได้เฉพาะตัวอักษรภาษาอังกฤษ ตัวเลข และขีดล่างเท่านั้น")
+    await showModal("ชื่อผู้ใช้สามารถมีได้เฉพาะตัวอักษรภาษาอังกฤษ ตัวเลข และขีดล่างเท่านั้น");
     return;
   }
 
   if (displayName.value.length > 128) {
-    await showModal("ชื่อที่แสดงต้องมีความยาวน้อยกว่า 128 ตัวอักษร")
+    await showModal("ชื่อที่แสดงต้องมีความยาวน้อยกว่า 128 ตัวอักษร");
     return;
   }
-  const message = `register_${Date.now()}`
+  const message = `register_${Date.now()}`;
   const signature = await provider.value?.request({
-    method: 'personal_sign',
-    params: [message, address.value]
-  })
+    method: "personal_sign",
+    params: [message, address.value],
+  });
 
-  const res = await fetch('https://paypoint.otternoon.com/v1/streamers', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+  const res = await fetch("https://paypoint.otternoon.com/v1/streamers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       wallet_addr: address.value,
       username: username.value,
       message,
-      signature
-    })
-  })
-  const data = await res.json()
+      signature,
+    }),
+  });
+  const data = await res.json();
   if (data.success) {
     hasAccount.value = true;
   }
-  if (data.error) await showModal(data.error)
+  if (data.error) await showModal(data.error);
 }
 
 async function updateProfile() {
-  const message = `register_${Date.now()}`
-  const signature = await provider.value?.request({
-    method: 'personal_sign',
-    params: [message, address.value]
-  }) as string
+  const message = `register_${Date.now()}`;
+  const signature = (await provider.value?.request({
+    method: "personal_sign",
+    params: [message, address.value],
+  })) as string;
 
   if (pendingAvatar.value) {
-    const formData = new FormData()
-    formData.append('file', pendingAvatar.value)
-    formData.append('wallet_addr', address.value)
-    formData.append('message', message)
-    formData.append('signature', signature)
-    const res = await fetch('https://paypoint.otternoon.com/v1/streamers/upload/avatar', {
-      method: 'POST', body: formData
-    })
-    const data = await res.json()
-    if (data.url) webConfig.value.avatarUrl = `${data.url}?v=${Date.now()}`
-    pendingAvatar.value = null
+    const formData = new FormData();
+    formData.append("file", pendingAvatar.value);
+    formData.append("wallet_addr", address.value);
+    formData.append("message", message);
+    formData.append("signature", signature);
+    const res = await fetch(
+      "https://paypoint.otternoon.com/v1/streamers/upload/avatar",
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+    const data = await res.json();
+    if (data.url) webConfig.value.avatarUrl = `${data.url}?v=${Date.now()}`;
+    pendingAvatar.value = null;
   }
 
   if (pendingBanner.value) {
-    const formData = new FormData()
-    formData.append('file', pendingBanner.value)
-    formData.append('wallet_addr', address.value)
-    formData.append('message', message)
-    formData.append('signature', signature)
-    const res = await fetch('https://paypoint.otternoon.com/v1/streamers/upload/banner', {
-      method: 'POST', body: formData
-    })
-    const data = await res.json()
-    if (data.url) webConfig.value.bannerUrl = data.url
-    pendingBanner.value = null
+    const formData = new FormData();
+    formData.append("file", pendingBanner.value);
+    formData.append("wallet_addr", address.value);
+    formData.append("message", message);
+    formData.append("signature", signature);
+    const res = await fetch(
+      "https://paypoint.otternoon.com/v1/streamers/upload/banner",
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+    const data = await res.json();
+    if (data.url) webConfig.value.bannerUrl = data.url;
+    pendingBanner.value = null;
   }
 
-  const res = await fetch('https://paypoint.otternoon.com/v1/streamers', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+  const res = await fetch("https://paypoint.otternoon.com/v1/streamers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       wallet_addr: address.value,
       username: username.value,
       display_name: displayName.value,
       web_config: JSON.stringify(webConfig.value),
       message,
-      signature
-    })
-  })
-  const data = await res.json()
-  if (data.success) await showModal('บันทึกสำเร็จ!')
-  if (data.error) await showModal(data.error)
+      signature,
+    }),
+  });
+  const data = await res.json();
+  if (data.success) await showModal("บันทึกสำเร็จ!");
+  if (data.error) await showModal(data.error);
 }
 
 function resetConfig() {
   username.value = streamer.value.username;
-  displayName.value = streamer.value.display_name ?? ''
+  displayName.value = streamer.value.display_name ?? "";
   webConfig.value = {
-    colors: {header: '#ffffff', text: 'oklch(0.83768 0.001 17.911)', background: '#1b1717'},
-    overlay: {...defaultOverlay}
-  }
+    colors: {
+      header: "#ffffff",
+      text: "oklch(0.83768 0.001 17.911)",
+      background: "#1b1717",
+    },
+    overlay: { ...defaultOverlay },
+  };
 }
 
-function selectFile(type: 'avatar' | 'banner', file: File) {
-  if (type === 'avatar') pendingAvatar.value = file
-  else pendingBanner.value = file
+function selectFile(type: "avatar" | "banner", file: File) {
+  if (type === "avatar") pendingAvatar.value = file;
+  else pendingBanner.value = file;
 }
 
 async function sendTestAlert() {
@@ -185,13 +206,13 @@ async function sendTestAlert() {
     "ซาร์ค มักเกอร์เบิร์ก",
     "บารัค โอมาม่า",
     "พี่บ้า เดอะสกี",
-    "กรมสรรพากร"
+    "กรมสรรพากร",
   ];
 
   const message = [
     "พี่เต พี่เต นั่นคือเสียงเรียกจากเด็ก ๆ ที่เห็นไอดอลของ พวกเขาเดินผ่านมา ต่างคนต่างดีใจที่ได้เห็นพี่เต วรากร คนที่น้อง ๆ เขาชื่นชอบตัวเป็น ๆ สักครั้ง",
-    "เลิศ, เริ่ด, เริ๊ด, เฬิฏ, เฬิฎ, เฬิศ, เฬิษ, เฬิส, เฬิฐ, เฬิษฐ์, เฬิฏฐ์, เฬิธ, เฬิธธิ์, เฬิท, เฬิฑ, เฬิฒ, เฬิจ, เฬิช, เฬิซ, เฬิถ, เฬิศศิ์, เฬิสร์, เฬิ๊ฏ"
-  ]
+    "เลิศ, เริ่ด, เริ๊ด, เฬิฏ, เฬิฎ, เฬิศ, เฬิษ, เฬิส, เฬิฐ, เฬิษฐ์, เฬิฏฐ์, เฬิธ, เฬิธธิ์, เฬิท, เฬิฑ, เฬิฒ, เฬิจ, เฬิช, เฬิซ, เฬิถ, เฬิศศิ์, เฬิสร์, เฬิ๊ฏ",
+  ];
 
   const testEvent = {
     event: "donation_received",
@@ -199,17 +220,19 @@ async function sendTestAlert() {
     message: message[Math.floor(Math.random() * message.length)],
     amount: "67",
     currency: "USDC",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 
   const ws = new WebSocket("wss://paypoint.otternoon.com/paymoi");
 
   ws.onopen = () => {
-    ws.send(JSON.stringify({
-      type: "test_alert",
-      wallet: address.value,
-      event: testEvent
-    }));
+    ws.send(
+      JSON.stringify({
+        type: "test_alert",
+        wallet: address.value,
+        event: testEvent,
+      }),
+    );
   };
 
   ws.onmessage = async (e) => {

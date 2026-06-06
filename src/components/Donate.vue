@@ -1,118 +1,143 @@
 <script setup lang="ts">
-import {useRoute} from "vue-router"
-import {useWeb3Auth} from '@web3auth/modal/vue'
-import {useWeb3AuthConnect} from '@web3auth/modal/vue'
-import {onMounted, ref, computed, watch} from "vue"
-import {fetchBalance, sendUSDC} from "../helpers.ts";
-import type {Streamer, WebConfig} from "../types.ts";
-import {showModal} from "../composables/useModal.ts";
+import { useRoute } from "vue-router";
+import { useWeb3Auth } from "@web3auth/modal/vue";
+import { useWeb3AuthConnect } from "@web3auth/modal/vue";
+import { onMounted, ref, computed, watch } from "vue";
+import { fetchBalance, sendUSDC } from "../helpers.ts";
+import type { Streamer, WebConfig } from "../types.ts";
+import { showModal } from "../composables/useModal.ts";
 
-const route = useRoute()
-const {provider} = useWeb3Auth()
-const {connect, isConnected} = useWeb3AuthConnect()
+const route = useRoute();
+const { provider } = useWeb3Auth();
+const { connect, isConnected } = useWeb3AuthConnect();
 
-const streamer = ref<Streamer | null>(null)
-const webConfig = ref<WebConfig>({})
-const notFound = ref(false)
+const streamer = ref<Streamer | null>(null);
+const webConfig = ref<WebConfig>({});
+const notFound = ref(false);
 
-const donatorName = ref("")
-const thbAmount = ref(20)
-const message = ref("")
-const rate = ref(33)
-const sending = ref(false)
+const donatorName = ref("");
+const thbAmount = ref(20);
+const message = ref("");
+const rate = ref(33);
+const sending = ref(false);
 const address = ref("");
 const usdcBalance = ref("0.00");
 const ethBalance = ref("0.0000");
 
+const usdcAmount = computed(() => (thbAmount.value / rate.value).toFixed(6));
 
-const usdcAmount = computed(() => (thbAmount.value / rate.value).toFixed(6))
-
-const avatarUrl = computed(() => webConfig.value.avatarUrl ?? `https://gravatar.com/avatar/${Date.now()}?d=retro&s=600`)
-const bannerUrl = computed(() => webConfig.value.bannerUrl ?? `https://picsum.photos/seed/${Date.now()}/800/600`)
+const avatarUrl = computed(
+  () =>
+    webConfig.value.avatarUrl ??
+    `https://gravatar.com/avatar/${Date.now()}?d=retro&s=600`,
+);
+const bannerUrl = computed(
+  () =>
+    webConfig.value.bannerUrl ??
+    `https://picsum.photos/seed/${Date.now()}/800/600`,
+);
 const bannerStyle = computed(() => ({
-  backgroundImage: bannerUrl.value ? `url(${bannerUrl.value})` : 'none',
-  backgroundColor: webConfig.value.colors?.background ?? '#1b1717',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center center',
-  backgroundRepeat: 'repeat',
-}))
-
+  backgroundImage: bannerUrl.value ? `url(${bannerUrl.value})` : "none",
+  backgroundColor: webConfig.value.colors?.background ?? "#1b1717",
+  backgroundSize: "cover",
+  backgroundPosition: "center center",
+  backgroundRepeat: "repeat",
+}));
 
 onMounted(async () => {
-  const name = route.params.name
-  const res = await fetch(`https://paypoint.otternoon.com/v1/streamers/${name}`)
-  const data = await res.json()
+  const name = route.params.name;
+  const res = await fetch(
+    `https://paypoint.otternoon.com/v1/streamers/${name}`,
+  );
+  const data = await res.json();
   if (!data.success) {
     notFound.value = true;
-    return
+    return;
   }
-  streamer.value = data.streamer
+  streamer.value = data.streamer;
   try {
-    webConfig.value = JSON.parse(data.streamer.web_config) ?? {}
-  } catch {
-  }
+    webConfig.value = JSON.parse(data.streamer.web_config) ?? {};
+  } catch {}
 
   try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=usd-coin&vs_currencies=thb')
-    const d = await r.json()
-    rate.value = d['usd-coin'].thb
-  } catch {
-  }
+    const r = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=usd-coin&vs_currencies=thb",
+    );
+    const d = await r.json();
+    rate.value = d["usd-coin"].thb;
+  } catch {}
 
   //@ts-ignore
   my_modal_5.showModal();
-})
+});
 
-watch(provider, async (p) => {
-  if (!p) return
-  const accounts = (await p.request({method: 'eth_accounts'})) as string[];
-  if (accounts?.length) {
-    address.value = accounts[0]
-    const {usdc, eth} = await fetchBalance(accounts[0]);
-    if (!usdc || !eth) {
-      alert("ไม่สามารถยอดเหรียญในบัญชีได้")
-    } else {
-      usdcBalance.value = usdc;
-      ethBalance.value = eth;
+watch(
+  provider,
+  async (p) => {
+    if (!p) return;
+    const accounts = (await p.request({ method: "eth_accounts" })) as string[];
+    if (accounts?.length) {
+      address.value = accounts[0];
+      const { usdc, eth } = await fetchBalance(accounts[0]);
+      if (!usdc || !eth) {
+        alert("ไม่สามารถยอดเหรียญในบัญชีได้");
+      } else {
+        usdcBalance.value = usdc;
+        ethBalance.value = eth;
+      }
     }
-  }
-}, {immediate: true})
-
+  },
+  { immediate: true },
+);
 
 async function donate() {
-  if (!provider.value || !streamer.value) return
+  if (!provider.value || !streamer.value) return;
   if (!donatorName.value) {
     await showModal("กรุณากรอกชื่อ");
-    return
+    return;
   }
   if (thbAmount.value < 1) {
     await showModal("จำนวนเงินขั้นต่ำ 1 บาท");
-    return
+    return;
   }
 
-  sending.value = true
+  sending.value = true;
   try {
-    const accounts = await provider.value.request({method: 'eth_accounts'}) as string[]
-    const from = accounts[0]
-    const txhash = await sendUSDC(provider.value, streamer.value.wallet_addr, usdcAmount.value)
-    await fetch('https://paypoint.otternoon.com/v1/donate/pending', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+    const accounts = (await provider.value.request({
+      method: "eth_accounts",
+    })) as string[];
+    const from = accounts[0];
+    const txhash = await sendUSDC(
+      provider.value,
+      streamer.value.wallet_addr,
+      usdcAmount.value,
+    );
+    await fetch("https://paypoint.otternoon.com/v1/donate/pending", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        from, to: streamer.value.wallet_addr,
+        from,
+        to: streamer.value.wallet_addr,
         amount: usdcAmount.value,
         donator: donatorName.value,
-        message: message.value, txhash
-      })
-    })
-    showModal("ธุรกรรมเสร็จสิ้น จะทำการแสดงหน้าประวัติธุรกรรมจาก BaseScan ที่เปิดในหน้าใหม่")
-        .then(() => {
-          window.open(import.meta.env.DEV ? `https://sepolia.basescan.org/tx/${txhash}` : `https://basescan.org/tx/${txhash}`, '_blank')
-        })
+        message: message.value,
+        txhash,
+      }),
+    });
+    showModal(
+      "ธุรกรรมเสร็จสิ้น จะทำการแสดงหน้าประวัติธุรกรรมจาก BaseScan ที่เปิดในหน้าใหม่",
+    ).then(() => {
+      window.open(
+        import.meta.env.DEV
+          ? `https://sepolia.basescan.org/tx/${txhash}`
+          : `https://basescan.org/tx/${txhash}`,
+        "_blank",
+      );
+    });
   } catch (e) {
-    await showModal("เกิดข้อผิดพลาด: " + e)
+    await showModal("เกิดข้อผิดพลาด: " + e);
   } finally {
-    sending.value = false
+    sending.value = false;
   }
 }
 </script>

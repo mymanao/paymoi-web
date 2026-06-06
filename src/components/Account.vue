@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import {useWeb3Auth, useWeb3AuthConnect, useWeb3AuthDisconnect} from '@web3auth/modal/vue'
-import {onMounted, ref, watch} from "vue";
-import {fetchBalance, randomTips, sendUSDC} from "../helpers.ts";
-import {showModal} from "../composables/useModal.ts";
+import {
+  useWeb3Auth,
+  useWeb3AuthConnect,
+  useWeb3AuthDisconnect,
+} from "@web3auth/modal/vue";
+import { onMounted, ref, watch } from "vue";
+import { fetchBalance, randomTips, sendUSDC } from "../helpers.ts";
+import { showModal } from "../composables/useModal.ts";
 
-const {connect, loading, isConnected} = useWeb3AuthConnect();
-const {disconnect} = useWeb3AuthDisconnect();
-const {provider} = useWeb3Auth()
+const { connect, loading, isConnected } = useWeb3AuthConnect();
+const { disconnect } = useWeb3AuthDisconnect();
+const { provider } = useWeb3Auth();
 
 const address = ref("");
 const usdcBalance = ref("0.00");
@@ -18,72 +22,83 @@ const transferAddress = ref("");
 const transferAmount = ref("");
 const sending = ref(false);
 
-watch(provider, async (p) => {
-  if (!p) return
-  const accounts = (await p.request({method: 'eth_accounts'})) as string[];
-  if (accounts?.length) {
-    address.value = accounts[0]
-    const {usdc, eth} = await fetchBalance(accounts[0]);
-    if (!usdc || !eth) {
-      await showModal("ไม่สามารถยอดเหรียญในบัญชีได้")
-    } else {
-      usdcBalance.value = usdc;
-      ethBalance.value = eth;
-      isFetchingBalance.value = false;
+watch(
+  provider,
+  async (p) => {
+    if (!p) return;
+    const accounts = (await p.request({ method: "eth_accounts" })) as string[];
+    if (accounts?.length) {
+      address.value = accounts[0];
+      const { usdc, eth } = await fetchBalance(accounts[0]);
+      if (!usdc || !eth) {
+        await showModal("ไม่สามารถยอดเหรียญในบัญชีได้");
+      } else {
+        usdcBalance.value = usdc;
+        ethBalance.value = eth;
+        isFetchingBalance.value = false;
+      }
     }
-  }
-}, {immediate: true})
+  },
+  { immediate: true },
+);
 
 onMounted(async () => {
   try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=usd-coin&vs_currencies=thb')
-    const d = await r.json()
-    rate.value = d['usd-coin'].thb
-  } catch {
-  }
-})
+    const r = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=usd-coin&vs_currencies=thb",
+    );
+    const d = await r.json();
+    rate.value = d["usd-coin"].thb;
+  } catch {}
+});
 
 async function transfer() {
-  if (!provider.value) return
+  if (!provider.value) return;
 
   if (!transferAddress.value) {
-    await showModal("กรุณากรอกเลขที่บัญชี")
-    return
+    await showModal("กรุณากรอกเลขที่บัญชี");
+    return;
   }
 
   if (!transferAmount.value || Number(transferAmount.value) <= 0) {
-    await showModal("กรุณากรอกจำนวนเงิน")
-    return
+    await showModal("กรุณากรอกจำนวนเงิน");
+    return;
   }
 
-  sending.value = true
+  sending.value = true;
 
   try {
     const txhash = await sendUSDC(
-        provider.value,
-        transferAddress.value,
-        transferAmount.value.toString()
-    )
+      provider.value,
+      transferAddress.value,
+      transferAmount.value.toString(),
+    );
 
-    const {usdc, eth} = await fetchBalance(address.value)
+    const { usdc, eth } = await fetchBalance(address.value);
     if (!usdc || !eth) {
-      await showModal("ไม่สามารถยอดเหรียญในบัญชีได้")
+      await showModal("ไม่สามารถยอดเหรียญในบัญชีได้");
     } else {
-      usdcBalance.value = usdc
-      ethBalance.value = eth
+      usdcBalance.value = usdc;
+      ethBalance.value = eth;
     }
 
-    transferAddress.value = ""
-    transferAmount.value = ""
+    transferAddress.value = "";
+    transferAmount.value = "";
 
-    showModal("ธุรกรรมเสร็จสิ้น จะทำการแสดงหน้าประวัติธุรกรรมจาก BaseScan ที่เปิดในหน้าใหม่")
-        .then(() => {
-          window.open(import.meta.env.DEV ? `https://sepolia.basescan.org/tx/${txhash}` : `https://basescan.org/tx/${txhash}`, '_blank')
-        })
+    showModal(
+      "ธุรกรรมเสร็จสิ้น จะทำการแสดงหน้าประวัติธุรกรรมจาก BaseScan ที่เปิดในหน้าใหม่",
+    ).then(() => {
+      window.open(
+        import.meta.env.DEV
+          ? `https://sepolia.basescan.org/tx/${txhash}`
+          : `https://basescan.org/tx/${txhash}`,
+        "_blank",
+      );
+    });
   } catch (e) {
-    await showModal("โอนไม่สำเร็จ: " + e)
+    await showModal("โอนไม่สำเร็จ: " + e);
   } finally {
-    sending.value = false
+    sending.value = false;
   }
 }
 </script>

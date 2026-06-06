@@ -1,6 +1,6 @@
 <script setup>
-import {Web3AuthProvider} from '@web3auth/modal/vue'
-import {web3AuthContextConfig} from './web3authContext'
+import { Web3AuthProvider } from "@web3auth/modal/vue";
+import { web3AuthContextConfig } from "./web3authContext";
 import Navbar from "./fragments/Navbar.vue";
 import Footer from "./fragments/Footer.vue";
 import Modal from "./fragments/Modal.vue";
