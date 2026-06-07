@@ -6,7 +6,7 @@ import { onMounted, ref, computed, watch } from "vue";
 import { fetchBalance, sendUSDC } from "../helpers.ts";
 import type { Streamer, WebConfig } from "../types.ts";
 import { showModal } from "../composables/useModal.ts";
-import {API_URL} from "../consts.ts";
+import { API_URL } from "../consts.ts";
 
 const route = useRoute();
 const { provider } = useWeb3Auth();
@@ -47,9 +47,7 @@ const bannerStyle = computed(() => ({
 
 onMounted(async () => {
   const name = route.params.name;
-  const res = await fetch(
-    `${API_URL}v1/streamers/${name}`,
-  );
+  const res = await fetch(`${API_URL}v1/streamers/${name}`);
   const data = await res.json();
   if (!data.success) {
     notFound.value = true;
@@ -135,7 +133,7 @@ async function donate() {
         amount: usdcAmount.value,
         message: message.value,
         signMessage,
-        signature
+        signature,
       }),
     });
     showModal(

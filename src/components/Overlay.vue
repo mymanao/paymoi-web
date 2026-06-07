@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import {API_URL, SOCKET_URL} from "../consts.ts";
+import { API_URL, SOCKET_URL } from "../consts.ts";
 
 interface OverlayConfig {
   imageUrl?: string;
@@ -92,9 +92,7 @@ onMounted(async () => {
   }
 
   try {
-    const res = await fetch(
-      `${API_URL}v1/streamers/wallet/${wallet}`,
-    );
+    const res = await fetch(`${API_URL}v1/streamers/wallet/${wallet}`);
     const data = await res.json();
     if (data.streamer?.web_config) {
       try {

@@ -25,7 +25,11 @@ const USDC_ABI = [
   },
 ] as const;
 
-const API_URL = import.meta.env.DEV ? "https://paypoint-sepolia.otternoon.com/" : "https://paypoint.otternoon.com/";
-const SOCKET_URL = import.meta.env.DEV ? "wss://paypoint-sepolia.otternoon.com/paymoi" : "wss://paypoint.otternoon.com/paymoi";
+const API_URL = import.meta.env.DEV
+  ? "https://paypoint-sepolia.otternoon.com/"
+  : "https://paypoint.otternoon.com/";
+const SOCKET_URL = import.meta.env.DEV
+  ? "wss://paypoint-sepolia.otternoon.com/paymoi"
+  : "wss://paypoint.otternoon.com/paymoi";
 
 export { url, publicClient, USDC_ADDRESS, USDC_ABI, API_URL, SOCKET_URL };

@@ -4,7 +4,7 @@ import { watch, ref } from "vue";
 import type { OverlayConfig, WebConfig } from "../types.ts";
 import { randomTips } from "../helpers.ts";
 import { showModal } from "../composables/useModal.ts";
-import {API_URL, SOCKET_URL} from "../consts.ts";
+import { API_URL, SOCKET_URL } from "../consts.ts";
 
 const defaultOverlay: OverlayConfig = {
   imageUrl: "https://pawmi.otternoon.com/assets/donate.gif",
@@ -54,9 +54,7 @@ watch(
 
 watch(address, async (a) => {
   if (!a) return;
-  const res = await fetch(
-    `${API_URL}v1/streamers/wallet/${a}`,
-  );
+  const res = await fetch(`${API_URL}v1/streamers/wallet/${a}`);
   const data = await res.json();
   if (data.streamer) {
     streamer.value = data.streamer;
