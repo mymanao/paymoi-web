@@ -113,16 +113,29 @@ async function donate() {
       streamer.value.wallet_addr,
       usdcAmount.value,
     );
-    await fetch(`${API_URL}v1/donate/pending`, {
+    const signMessage = JSON.stringify({
+      tx_hash: txhash,
+      from,
+      to: streamer.value.wallet_addr,
+      amount: usdcAmount.value,
+      timestamp: Date.now(),
+    });
+    const signature = (await provider.value?.request({
+      method: "personal_sign",
+      params: [signMessage, address.value],
+    })) as string;
+    await fetch(`${API_URL}v1/donations`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        from,
-        to: streamer.value.wallet_addr,
+        tx_hash: txhash,
+        donator_name: donatorName.value,
+        donator_wallet_addr: from,
+        streamer_wallet_addr: streamer.value.wallet_addr,
         amount: usdcAmount.value,
-        donator: donatorName.value,
         message: message.value,
-        txhash,
+        signMessage,
+        signature
       }),
     });
     showModal(
